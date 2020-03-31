@@ -1,26 +1,24 @@
 class Pianobar < Formula
   desc "Command-line player for https://pandora.com"
   homepage "https://github.com/PromyLOPh/pianobar/"
-  url "https://6xq.net/pianobar/pianobar-2017.08.30.tar.bz2"
-  sha256 "ec14db6cf1a7dbc1d8190b5ca0d256021e970587bcdaeb23904d4bca71a04674"
+  url "https://6xq.net/pianobar/pianobar-2019.02.14.tar.bz2"
+  sha256 "c0bd0313b31492ed266d1932d319cfe2a4be7024686492c458bb5e4ceb0ee21f"
   head "https://github.com/PromyLOPh/pianobar.git"
 
   bottle do
     cellar :any
-    sha256 "e4d59eee9e6d6d6b78b5bd2541a7faa23beda9edbe9179678cb46ca006e616f0" => :high_sierra
-    sha256 "327b53a2b9e2fd6824d0c854b5ea411b29b07ba5804b443c453aee05a86e36d4" => :sierra
-    sha256 "ea582da39bf90a0122d74678cdf82349af53adcbab48ff5bd2d57c64ca16150f" => :el_capitan
-    sha256 "41d44c9f1680fa404639ae9b907df30bbb019b1628454e8d77eba95af6a1a883" => :yosemite
+    sha256 "0e9129214de23a285f6fbe90ee3a078435fa74d86a0b0890bd89a466283edcda" => :catalina
+    sha256 "f8e2e06461658017ffa0cc6a6c06d49cfed91cbf359b7d23875512e657fd027f" => :mojave
+    sha256 "aee9b756146a2440ea1c370b11d165088a68d733bf17be413232a88106e8df6f" => :high_sierra
   end
 
   depends_on "pkg-config" => :build
-  depends_on "libao"
-  depends_on "mad"
-  depends_on "faad2"
-  depends_on "gnutls"
-  depends_on "libgcrypt"
-  depends_on "json-c"
   depends_on "ffmpeg"
+  depends_on "json-c"
+  depends_on "libao"
+  depends_on "libgcrypt"
+
+  uses_from_macos "curl"
 
   def install
     # Discard Homebrew's CFLAGS as Pianobar reportedly doesn't like them
@@ -33,5 +31,13 @@ class Pianobar < Formula
     system "make", "install", "PREFIX=#{prefix}"
 
     prefix.install "contrib"
+  end
+
+  test do
+    require "pty"
+    PTY.spawn(bin/"pianobar") do |stdout, stdin, _pid|
+      stdin.putc "\n"
+      assert_match "pianobar (#{version})", stdout.read
+    end
   end
 end

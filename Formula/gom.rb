@@ -1,39 +1,31 @@
 class Gom < Formula
   desc "GObject wrapper around SQLite"
   homepage "https://wiki.gnome.org/Projects/Gom"
-  url "https://download.gnome.org/sources/gom/0.3/gom-0.3.3.tar.xz"
-  sha256 "ac57e34b5fe273ed306efaeabb346712c264e341502913044a782cdf8c1036d8"
-  revision 5
+  url "https://download.gnome.org/sources/gom/0.4/gom-0.4.tar.xz"
+  sha256 "68d08006aaa3b58169ce7cf1839498f45686fba8115f09acecb89d77e1018a9d"
 
   bottle do
-    sha256 "90cc6ffc759414df0b846d26adf400ffc512c408854923e9aa34da0506351883" => :high_sierra
-    sha256 "e74c3a447e1732a170689526644c6d1f208ce4d48ba3c7f82de491f6c4620ca5" => :sierra
-    sha256 "7b08fdd3e5744b3bfa8e72333dde59a9a258692e680d67e191d09b0460008dc0" => :el_capitan
+    cellar :any
+    sha256 "1f88c8df8a310b7b51f71f299b845239e713f8d80bcc65ef092cfb0ffcd827df" => :catalina
+    sha256 "7f8af3c459f54e9ccbe6cadcdddcc949786639eef6ea186f476bc64ea5d50ff7" => :mojave
+    sha256 "eafb8a7c6fcc581ba8fc2f00a45940f0af3b7d28f2f856d961918951a3b9b346" => :high_sierra
   end
 
   depends_on "gobject-introspection" => :build
-  depends_on "pkg-config" => :build
-  depends_on "meson-internal" => :build
+  depends_on "meson" => :build
   depends_on "ninja" => :build
+  depends_on "pkg-config" => :build
   depends_on "python" => :build
   depends_on "gdk-pixbuf"
   depends_on "gettext"
   depends_on "glib"
 
-  patch :DATA
-
   def install
-    ENV.refurbish_args
-
     pyver = Language::Python.major_minor_version "python3"
 
-    # prevent sandbox violation
-    inreplace "bindings/python/meson.build",
-              "install_dir: pygobject_override_dir",
-              "install_dir: '#{lib}/python#{pyver}/site-packages'"
-
     mkdir "build" do
-      system "meson", "--prefix=#{prefix}", ".."
+      system "meson", "--prefix=#{prefix}",
+        "-Dpygobject-override-dir=#{lib}/python#{pyver}/site-packages", ".."
       system "ninja"
       system "ninja", "install"
     end
@@ -67,44 +59,3 @@ class Gom < Formula
     system "./test"
   end
 end
-
-__END__
-diff --git a/bindings/python/meson.build b/bindings/python/meson.build
-index feb4a9c..2fda8c1 100644
---- a/bindings/python/meson.build
-+++ b/bindings/python/meson.build
-@@ -1,33 +1 @@
--python3 = import('python3').find_python()
--
--get_overridedir = '''
--import os
--import sysconfig
--
--libdir = sysconfig.get_config_var('LIBDIR')
--
--if not libdir:
--  libdir = '/usr/lib'
--
--try:
--  import gi
--  overridedir = gi._overridesdir
--except ImportError:
--  purelibdir = sysconfig.get_path('purelib')
--  overridedir = os.path.join(purelibdir, 'gi', 'overrides')
--
--if overridedir.startswith(libdir): # Should always be True..
--  overridedir = overridedir[len(libdir) + 1:]
--
--print(overridedir)
--'''
--
--ret = run_command([python3, '-c', get_overridedir])
--
--if ret.returncode() != 0
--  error('Failed to determine pygobject overridedir')
--else
--  pygobject_override_dir = join_paths(get_option('libdir'), ret.stdout().strip())
--endif
--
- install_data('gi/overrides/Gom.py', install_dir: pygobject_override_dir)
-

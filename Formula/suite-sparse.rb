@@ -1,18 +1,23 @@
 class SuiteSparse < Formula
   desc "Suite of Sparse Matrix Software"
   homepage "http://faculty.cse.tamu.edu/davis/suitesparse.html"
-  url "http://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-5.2.0.tar.gz"
-  sha256 "3c46c035ea8217649958a0f73360e825b0c9dcca4e32a9349d2c7678c0d48813"
+  url "https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/v5.7.1.tar.gz"
+  sha256 "5ba5add1663d51a1b6fb128b50fe869b497f3096765ff7f8212f0ede044b9557"
 
   bottle do
     cellar :any
-    sha256 "2d87260480f276e87774a09a24e634953357e5e42852300416535d1383d17cfb" => :high_sierra
-    sha256 "accf1abe0b174630a5f41bac52d9ace961fd6a721f5b82961e70161ddddca5c2" => :sierra
-    sha256 "b0d375015d7c8b96d06c03765f4d838b2045ca11d7381423d20131ba6bdd7ee4" => :el_capitan
+    sha256 "9d6feb2e2feb55df212703fd30a766676fa9e71f0ed9bdff49a120b9fe60396d" => :catalina
+    sha256 "ce6d357d71455dc59dec5ec7e9739c6f8b6d981c6c0359eaf78df1308b0f246d" => :mojave
+    sha256 "cb174cb7a53753f331d52422cf548262d014b26f7d50c0a13ff1141195b7d922" => :high_sierra
   end
 
   depends_on "cmake" => :build
   depends_on "metis"
+  depends_on "openblas"
+
+  uses_from_macos "m4"
+
+  conflicts_with "mongoose", :because => "suite-sparse vendors libmongoose.dylib"
 
   def install
     mkdir "GraphBLAS/build" do
@@ -21,7 +26,7 @@ class SuiteSparse < Formula
 
     args = [
       "INSTALL=#{prefix}",
-      "BLAS=-framework Accelerate",
+      "BLAS=-L#{Formula["openblas"].opt_lib} -lopenblas",
       "LAPACK=$(BLAS)",
       "MY_METIS_LIB=-L#{Formula["metis"].opt_lib} -lmetis",
       "MY_METIS_INC=#{Formula["metis"].opt_include}",
@@ -34,7 +39,8 @@ class SuiteSparse < Formula
 
   test do
     system ENV.cc, "-o", "test", pkgshare/"klu_simple.c",
-                   "-L#{lib}", "-lsuitesparseconfig", "-lklu"
-    system "./test"
+           "-L#{lib}", "-lsuitesparseconfig", "-lklu"
+    assert_predicate testpath/"test", :exist?
+    assert_match "x [0] = 1", shell_output("./test")
   end
 end

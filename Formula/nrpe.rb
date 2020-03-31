@@ -1,18 +1,18 @@
 class Nrpe < Formula
   desc "Nagios remote plugin executor"
   homepage "https://www.nagios.org/"
-  url "https://downloads.sourceforge.net/project/nagios/nrpe-3.x/nrpe-3.2.1.tar.gz"
-  sha256 "8ad2d1846ab9011fdd2942b8fc0c99dfad9a97e57f4a3e6e394a4ead99c0f1f0"
+  url "https://downloads.sourceforge.net/project/nagios/nrpe-4.x/nrpe-4.0.0.tar.gz"
+  sha256 "a3d0a7ac5385421dfcc29afce7eeade13ca10d8d9115ca5c2962b72946c88a1e"
 
   bottle do
     cellar :any
-    sha256 "98eb09fe948052448134155aad5cc16892f9cffeba075cfc9afeb38219047806" => :high_sierra
-    sha256 "d589496fa3b62e1425f93ebf928234bcfec81cf342837e7b741c9def56ea3e28" => :sierra
-    sha256 "50cafb3e1545d93f0ad248a2696b83b90fa3fbb6e5afc731d72779ddab0bf6a0" => :el_capitan
+    sha256 "eb75e8cbf609bf4a2d514fc03341bb33144d7cde87fcc174abc160ccd15f8683" => :catalina
+    sha256 "34c54f47ac9a79e2e698df0cf693e3b99e3aedbfb193ab626febb8eb21a1e30f" => :mojave
+    sha256 "169a4d77296cd0abd2b048faa223eab53fd3cbd44911c3a394dc28103d1ab71a" => :high_sierra
   end
 
   depends_on "nagios-plugins"
-  depends_on "openssl"
+  depends_on "openssl@1.1"
 
   def install
     user  = `id -un`.chomp
@@ -26,9 +26,9 @@ class Nrpe < Formula
                           "--with-nrpe-group=#{group}",
                           "--with-nagios-user=#{user}",
                           "--with-nagios-group=#{group}",
-                          "--with-ssl=#{Formula["openssl"].opt_prefix}",
+                          "--with-ssl=#{Formula["openssl@1.1"].opt_prefix}",
                           # Set both or it still looks for /usr/lib
-                          "--with-ssl-lib=#{Formula["openssl"].opt_lib}",
+                          "--with-ssl-lib=#{Formula["openssl@1.1"].opt_lib}",
                           "--enable-ssl",
                           "--enable-command-args"
 
@@ -47,28 +47,29 @@ class Nrpe < Formula
 
   plist_options :manual => "nrpe -n -c #{HOMEBREW_PREFIX}/etc/nrpe.cfg -d"
 
-  def plist; <<~EOS
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    <plist version="1.0">
-    <dict>
-      <key>Label</key>
-      <string>org.nrpe.agent</string>
-      <key>ProgramArguments</key>
-      <array>
-        <string>#{opt_bin}/nrpe</string>
-        <string>-c</string>
-        <string>#{etc}/nrpe.cfg</string>
-        <string>-d</string>
-      </array>
-      <key>RunAtLoad</key>
-      <true/>
-      <key>ServiceDescription</key>
-      <string>Homebrew NRPE Agent</string>
-      <key>Debug</key>
-      <true/>
-    </dict>
-    </plist>
+  def plist
+    <<~EOS
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+      <dict>
+        <key>Label</key>
+        <string>org.nrpe.agent</string>
+        <key>ProgramArguments</key>
+        <array>
+          <string>#{opt_bin}/nrpe</string>
+          <string>-c</string>
+          <string>#{etc}/nrpe.cfg</string>
+          <string>-d</string>
+        </array>
+        <key>RunAtLoad</key>
+        <true/>
+        <key>ServiceDescription</key>
+        <string>Homebrew NRPE Agent</string>
+        <key>Debug</key>
+        <true/>
+      </dict>
+      </plist>
     EOS
   end
 

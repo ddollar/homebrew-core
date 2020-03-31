@@ -4,23 +4,24 @@ class Agda < Formula
   include Language::Haskell::Cabal
 
   desc "Dependently typed functional programming language"
-  homepage "http://wiki.portal.chalmers.se/agda/"
+  homepage "https://wiki.portal.chalmers.se/agda/"
   revision 2
 
   stable do
-    url "https://hackage.haskell.org/package/Agda-2.5.3/Agda-2.5.3.tar.gz"
-    sha256 "aa14d4a3582013100f71e64d71c5deff6caa2a286083e20fc16f6dbb0fdf0065"
+    url "https://hackage.haskell.org/package/Agda-2.6.0.1/Agda-2.6.0.1.tar.gz"
+    sha256 "7bb88a9cd4a556259907ccc71d54e2acc9d3e9ce05486ffdc83f721c7c06c0e8"
 
     resource "stdlib" do
       url "https://github.com/agda/agda-stdlib.git",
-          :revision => "477ba28360133b1f5c45ce1b4e6b4efd467af331"
+          :tag      => "v1.2",
+          :revision => "e47adf6ba5aa52ae394a7c60a3b5d3f4790db9d7"
     end
   end
 
   bottle do
-    sha256 "980ba8990c9ab843e27a2576ee118dccd9b4eec025e4012c1b3fc66cdc24893d" => :high_sierra
-    sha256 "812e52e62901399abaef8f3ec2b74e161c16ecdc1b7a624136bde73c77814eb0" => :sierra
-    sha256 "c7d1d59c26f301e822186788a60c6187a24dc182446c83aa4918ef325f4adf2f" => :el_capitan
+    sha256 "d170a03ce454472dccfd2102e9370657a871bbaa05fa97f2b215397f672a9818" => :catalina
+    sha256 "16697093b5fdc887147f2b3d778ada4b3b5b7476a3c81e2cb564823e63a45fe9" => :mojave
+    sha256 "ef91aee38d08b5710dc46c590b91f4e4cac6e121c922c219ca3577b56916afed" => :high_sierra
   end
 
   head do
@@ -31,64 +32,44 @@ class Agda < Formula
     end
   end
 
-  deprecated_option "without-ghc" => "without-ghc@8.2"
-  deprecated_option "without-malonzo" => "without-ghc@8.2"
+  depends_on "cabal-install" => [:build, :test]
+  depends_on "emacs"
+  depends_on "ghc@8.6" # 8.8 will be supported in the next release
 
-  option "without-stdlib", "Don't install the Agda standard library"
-  option "without-ghc@8.2", "Disable the GHC backend"
-
-  depends_on "ghc@8.2" => :recommended
-  if build.with? "ghc@8.2"
-    depends_on "cabal-install" => [:build, :test]
-  else
-    depends_on "cabal-install" => :build
-    depends_on "ghc@8.2" => :build
-  end
-
-  depends_on "emacs" => :recommended
+  uses_from_macos "zlib"
 
   def install
     # install Agda core
     install_cabal_package :using => ["alex", "happy", "cpphs"]
 
-    if build.with? "stdlib"
-      resource("stdlib").stage lib/"agda"
+    resource("stdlib").stage lib/"agda"
 
-      # generate the standard library's bytecode
-      cd lib/"agda" do
-        cabal_sandbox :home => buildpath, :keep_lib => true do
-          cabal_install "--only-dependencies"
-          cabal_install
-          system "GenerateEverything"
-        end
+    # generate the standard library's bytecode
+    cd lib/"agda" do
+      cabal_sandbox :home => buildpath, :keep_lib => true do
+        cabal_install "--only-dependencies"
+        cabal_install
+        system "GenerateEverything"
       end
+    end
 
-      # generate the standard library's documentation and vim highlighting files
-      cd lib/"agda" do
-        system bin/"agda", "-i", ".", "-i", "src", "--html", "--vim", "README.agda"
-      end
+    # generate the standard library's documentation and vim highlighting files
+    cd lib/"agda" do
+      system bin/"agda", "-i", ".", "-i", "src", "--html", "--vim", "README.agda"
     end
 
     # compile the included Emacs mode
-    if build.with? "emacs"
-      system bin/"agda-mode", "compile"
-      elisp.install_symlink Dir["#{share}/*/Agda-#{version}/emacs-mode/*"]
-    end
+    system bin/"agda-mode", "compile"
+    elisp.install_symlink Dir["#{share}/*/Agda-#{version}/emacs-mode/*"]
   end
 
   def caveats
-    s = ""
-
-    if build.with? "stdlib"
-      s += <<~EOS
-        To use the Agda standard library by default:
-          mkdir -p ~/.agda
-          echo #{HOMEBREW_PREFIX}/lib/agda/standard-library.agda-lib >>~/.agda/libraries
-          echo standard-library >>~/.agda/defaults
-      EOS
-    end
-
-    s
+    <<~EOS
+      To use the Agda standard library by default:
+        mkdir -p ~/.agda
+        echo #{HOMEBREW_PREFIX}/lib/agda/standard-library.agda-lib >>~/.agda/libraries
+        echo standard-library >>~/.agda/defaults
+    EOS
   end
 
   test do
@@ -139,7 +120,7 @@ class Agda < Formula
       postulate
         return : ∀ {A : Set} → A → IO A
 
-      {-# COMPILED return (\\_ -> return) #-}
+      {-# COMPILE GHC return = \\_ -> return #-}
 
       main : _
       main = return tt
@@ -159,31 +140,24 @@ class Agda < Formula
     system bin/"agda", simpletest
 
     # typecheck a module that uses the standard library
-    if build.with? "stdlib"
-      system bin/"agda", "-i", lib/"agda"/"src", stdlibtest
-    end
+    system bin/"agda", "-i", lib/"agda"/"src", stdlibtest
 
     # compile a simple module using the JS backend
     system bin/"agda", "--js", simpletest
 
     # test the GHC backend
-    if build.with? "ghc@8.2"
-      ENV.prepend_path "PATH", Formula["ghc@8.2"].opt_bin
-      cabal_sandbox do
-        cabal_install "text", "ieee754"
-        dbpath = Dir["#{testpath}/.cabal-sandbox/*-packages.conf.d"].first
-        dbopt = "--ghc-flag=-package-db=#{dbpath}"
+    cabal_sandbox do
+      cabal_install "text", "ieee754"
+      dbpath = Dir["#{testpath}/.cabal-sandbox/*-packages.conf.d"].first
+      dbopt = "--ghc-flag=-package-db=#{dbpath}"
 
-        # compile and run a simple program
-        system bin/"agda", "-c", dbopt, iotest
-        assert_equal "", shell_output(testpath/"IOTest")
+      # compile and run a simple program
+      system bin/"agda", "-c", dbopt, iotest
+      assert_equal "", shell_output(testpath/"IOTest")
 
-        # compile and run a program that uses the standard library
-        if build.with? "stdlib"
-          system bin/"agda", "-c", "-i", lib/"agda"/"src", dbopt, stdlibiotest
-          assert_equal "Hello, world!", shell_output(testpath/"StdlibIOTest")
-        end
-      end
+      # compile and run a program that uses the standard library
+      system bin/"agda", "-c", "-i", lib/"agda"/"src", dbopt, stdlibiotest
+      assert_equal "Hello, world!", shell_output(testpath/"StdlibIOTest")
     end
   end
 end

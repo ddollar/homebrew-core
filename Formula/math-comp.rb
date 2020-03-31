@@ -1,23 +1,22 @@
 class MathComp < Formula
   desc "Mathematical Components for the Coq proof assistant"
   homepage "https://math-comp.github.io/math-comp/"
-  url "https://github.com/math-comp/math-comp/archive/mathcomp-1.6.4.tar.gz"
-  sha256 "c672a4237f708b5f03f1feed9de37f98ef5c331819047e1f71b5762dcd92b262"
-  revision 1
+  url "https://github.com/math-comp/math-comp/archive/mathcomp-1.10.0.tar.gz"
+  sha256 "3f8a88417f3456da05e2755ea0510c1bd3fd13b13c41e62fbaa3de06be040166"
+  revision 2
   head "https://github.com/math-comp/math-comp.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "e7801ad3b348b574bc81c1079cf7606783363af1cc8aac2af4bc5b81df5f7747" => :high_sierra
-    sha256 "fcb4e065518406f6dcfca6580d0cf1da7b2d7063dd164e27859a98b11f515ae3" => :sierra
-    sha256 "fcb4e065518406f6dcfca6580d0cf1da7b2d7063dd164e27859a98b11f515ae3" => :el_capitan
+    sha256 "6a5e3378d663d69eae75fe6b59a0531a00d88e474f8f7f5a3e255cac76b14e63" => :catalina
+    sha256 "127f7df93e47816106aa637d9ee65190d23c3d6829efa648e03bb4e5fda8df8d" => :mojave
+    sha256 "6a5e3378d663d69eae75fe6b59a0531a00d88e474f8f7f5a3e255cac76b14e63" => :high_sierra
   end
 
   depends_on "ocaml" => :build
   depends_on "coq"
 
   def install
-    coqbin = "#{Formula["coq"].opt_bin}/"
     coqlib = "#{lib}/coq/"
 
     (buildpath/"mathcomp/Makefile.coq.local").write <<~EOS
@@ -25,15 +24,14 @@ class MathComp < Formula
     EOS
 
     cd "mathcomp" do
-      system "make", "MAKEFLAGS=#{ENV["MAKEFLAGS"]}", "COQBIN=#{coqbin}"
-      system "make", "install", "MAKEFLAGS=#{ENV["MAKEFLAGS"]}", "COQBIN=#{coqbin}"
+      system "make", "Makefile.coq"
+      system "make", "-f", "Makefile.coq", "MAKEFLAGS=#{ENV["MAKEFLAGS"]}"
+      system "make", "install", "MAKEFLAGS=#{ENV["MAKEFLAGS"]}"
 
       elisp.install "ssreflect/pg-ssr.el"
     end
 
-    system "make", "-C", "htmldoc", "COQBIN=#{coqbin}" if build.head?
-
-    doc.install Dir["htmldoc/*"]
+    doc.install Dir["docs/*"]
   end
 
   test do

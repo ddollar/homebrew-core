@@ -1,40 +1,27 @@
 class Libomp < Formula
   desc "LLVM's OpenMP runtime library"
   homepage "https://openmp.llvm.org/"
-  url "https://releases.llvm.org/5.0.1/openmp-5.0.1.src.tar.xz"
-  sha256 "adb635cdd2f9f828351b1e13d892480c657fb12500e69c70e007bddf0fca2653"
+  url "https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/openmp-9.0.1.src.tar.xz"
+  sha256 "5c94060f846f965698574d9ce22975c0e9f04c9b14088c3af5f03870af75cace"
 
   bottle do
     cellar :any
-    sha256 "b979a1127556d48732079825ee9386df0454124b86062a1bbd9dfce4cc15e80c" => :high_sierra
-    sha256 "9e869b95916c6246647f5ff75e0e117d47ba7cdde5c6d408f46e4535c2e848ec" => :sierra
-    sha256 "f3b27cb2f45233a981b9a9cd62ab77fb0935857ec4b7b386c17485be1f9f6f39" => :el_capitan
+    sha256 "a8e25c1cb3c210b9be41aa4e93da1723d420138e8ff1ebffc3ac93c55cf8865e" => :catalina
+    sha256 "6aca3210c348307206043e772c9d98527337e7c42e38b4981534a2baccf25591" => :mojave
+    sha256 "a6f0785589272c07d40703d14404da79e880fdceb4e49dc2095fb05fd0054c0d" => :high_sierra
   end
 
   depends_on "cmake" => :build
   depends_on :macos => :yosemite
 
   def install
-    system "cmake", ".", *std_cmake_args
+    # Disable LIBOMP_INSTALL_ALIASES, otherwise the library is installed as
+    # libgomp alias which can conflict with GCC's libgomp.
+    system "cmake", ".", *std_cmake_args, "-DLIBOMP_INSTALL_ALIASES=OFF"
     system "make", "install"
-    system "cmake", ".", "-DLIBOMP_ENABLE_SHARED=OFF", *std_cmake_args
+    system "cmake", ".", "-DLIBOMP_ENABLE_SHARED=OFF", *std_cmake_args,
+                         "-DLIBOMP_INSTALL_ALIASES=OFF"
     system "make", "install"
-  end
-
-  def caveats; <<~EOS
-    On Apple Clang, you need to add several options to use OpenMP's front end
-    instead of the standard driver option. This usually looks like
-      -Xpreprocessor -fopenmp -lomp
-
-    You might need to make sure the lib and include directories are discoverable
-    if #{HOMEBREW_PREFIX} is not searched:
-
-      -L#{opt_lib} -I#{opt_include}
-
-    For CMake, the following flags will cause the OpenMP::OpenMP_CXX target to
-    be set up correctly:
-      -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I#{opt_include}" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=#{opt_lib}/libomp.dylib
-    EOS
   end
 
   test do
@@ -53,7 +40,7 @@ class Libomp < Formula
         else
             return 1;
       }
-      EOS
+    EOS
     system ENV.cxx, "-Werror", "-Xpreprocessor", "-fopenmp", "test.cpp",
                     "-L#{lib}", "-lomp", "-o", "test"
     system "./test"

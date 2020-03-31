@@ -1,36 +1,33 @@
 class Gromacs < Formula
   desc "Versatile package for molecular dynamics calculations"
   homepage "http://www.gromacs.org/"
-  url "https://ftp.gromacs.org/pub/gromacs/gromacs-2018.tar.gz"
-  sha256 "deb5d0b749a52a0c6083367b5f50a99e08003208d81954fb49e7009e1b1fd0e9"
+  url "https://ftp.gromacs.org/pub/gromacs/gromacs-2020.1.tar.gz"
+  sha256 "e1666558831a3951c02b81000842223698016922806a8ce152e8f616e29899cf"
 
   bottle do
-    sha256 "c9a80ad8b736c718b8dad61a2150239cf362f471e5651e31e29f9c7eac50698c" => :high_sierra
-    sha256 "f2591692c45ce6f2b584eb62c113e72143c1930276b9cdcfa5072f191add99f9" => :sierra
-    sha256 "2da1f5cc720905623d23591b30adf60a1c78bb09b25735949dfd2c426dac287f" => :el_capitan
+    sha256 "72d49c0e34e42499f3f415d2eb0945a6a92446237b7175b385e546c3534e5b98" => :catalina
+    sha256 "bfab3f87481535fbfbfb6c03b22b0ffd27ebebf98fef1b3dba88fe5d36394f1d" => :mojave
+    sha256 "159631826837201f2d33cd1e6b018928c5e2fe82a3973439ed9e62a4f461da6e" => :high_sierra
   end
-
-  option "with-double", "Enables double precision"
-  option "with-mpi", "Enable parallel support"
 
   depends_on "cmake" => :build
   depends_on "fftw"
-  depends_on "gsl"
-  depends_on "open-mpi" if build.with? "mpi"
-  depends_on :x11 => :optional
+  depends_on "gcc" # for OpenMP
+  depends_on "openblas"
 
   def install
-    args = std_cmake_args + %w[-DGMX_GSL=ON]
-    args << "-DGMX_DOUBLE=ON" if build.include? "enable-double"
-    args << "-DGMX_MPI=ON" if build.with? "mpi"
-    args << "-DGMX_X11=ON" if build.with? "x11"
+    # Non-executable GMXRC files should be installed in DATADIR
+    inreplace "scripts/CMakeLists.txt", "CMAKE_INSTALL_BINDIR",
+                                        "CMAKE_INSTALL_DATADIR"
 
-    inreplace "scripts/CMakeLists.txt", "BIN_INSTALL_DIR", "DATA_INSTALL_DIR"
+    args = std_cmake_args + %w[
+      -DCMAKE_C_COMPILER=gcc-9
+      -DCMAKE_CXX_COMPILER=g++-9
+    ]
 
     mkdir "build" do
       system "cmake", "..", *args
-      system "make"
-      ENV.deparallelize { system "make", "install" }
+      system "make", "install"
     end
 
     bash_completion.install "build/scripts/GMXRC" => "gromacs-completion.bash"
@@ -39,9 +36,10 @@ class Gromacs < Formula
     zsh_completion.install "build/scripts/GMXRC.zsh" => "_gromacs"
   end
 
-  def caveats; <<~EOS
-    GMXRC and other scripts installed to:
-      #{HOMEBREW_PREFIX}/share/gromacs
+  def caveats
+    <<~EOS
+      GMXRC and other scripts installed to:
+        #{HOMEBREW_PREFIX}/share/gromacs
     EOS
   end
 

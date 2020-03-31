@@ -1,21 +1,21 @@
 class Pick < Formula
   desc "Utility to choose one option from a set of choices"
   homepage "https://github.com/calleerlandsson/pick"
-  url "https://github.com/calleerlandsson/pick/releases/download/v2.0.1/pick-2.0.1.tar.gz"
-  sha256 "4a596b8f40a316bc4e2c0d8e8842810d7a7b69d464a410e4ee2a6574e01629e3"
+  url "https://github.com/calleerlandsson/pick/releases/download/v3.0.1/pick-3.0.1.tar.gz"
+  sha256 "668c863751f94ad90e295cf861a80b4d94975e06645f401d7f82525e607c0266"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "b929f5739b2bd0ab8df7ea5d941899fec265bc576fcc1660b3e16a3dc95a1f3a" => :high_sierra
-    sha256 "1633f9112356cfa6a70f6aca24e38f20e371a109234a7381993bb44b1a9caa9f" => :sierra
-    sha256 "29fe7c34922662f10555594fb3f817863d872aea289d51ddc2f98ba8921e2674" => :el_capitan
+    sha256 "3f5c3b2a34966596f3e5ddf33de5524f656aa558a00fcd6ef47c262115a872d6" => :catalina
+    sha256 "4f376e252f19746091a38cc04c25ba95b69b91855e9655e91ddff1e79cc3b6f4" => :mojave
+    sha256 "596b06179a358b1be315dedaef900d28c059ef710c428ecbbbb5072c2294380e" => :high_sierra
+    sha256 "e91e7c5882344a8d2722c50bad65959aacfdef739206aec833722b6f00a2e8a2" => :sierra
   end
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
-    system "make", "check"
+    ENV["PREFIX"] = prefix
+    ENV["MANDIR"] = man
+    system "./configure"
     system "make", "install"
   end
 

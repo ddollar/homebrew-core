@@ -1,16 +1,18 @@
 class Ncview < Formula
   desc "Visual browser for netCDF format files"
-  homepage "http://meteora.ucsd.edu/~pierce/ncview_home_page.html"
-  url "ftp://cirrus.ucsd.edu/pub/ncview/ncview-2.1.7.tar.gz"
-  sha256 "a14c2dddac0fc78dad9e4e7e35e2119562589738f4ded55ff6e0eca04d682c82"
-  revision 5
+  homepage "https://cirrus.ucsd.edu/ncview/"
+  url "ftp://cirrus.ucsd.edu/pub/ncview/ncview-2.1.8.tar.gz"
+  mirror "https://dl.bintray.com/homebrew/mirror/ncview--2.1.8.tar.gz"
+  sha256 "e8badc507b9b774801288d1c2d59eb79ab31b004df4858d0674ed0d87dfc91be"
+  revision 2
 
   bottle do
-    sha256 "bd2df1b3290bf6fc03543fecf727698064f858329b62d7665f516bff8e094067" => :high_sierra
-    sha256 "df920fc488f54f8f128f635c42c618fed9cf82beaed5e99087b44397e3770066" => :sierra
-    sha256 "65e303f36bc95f74adcac5eac2c6f11a3d474ad1babd573016576c8467320214" => :el_capitan
+    sha256 "9bb98b4208dfc00199b0b900c7a7d31b8565a676dc546a08021ad7a35c4a8ce9" => :catalina
+    sha256 "812c6d6fc80aa2580d397f0a67c73888715015b31655813f79c915413499d767" => :mojave
+    sha256 "c4a5fc76076f1f2c2f64f68bd107671d6d9d661fab98322b51c763de9a3ea3d9" => :high_sierra
   end
 
+  depends_on "libpng"
   depends_on "netcdf"
   depends_on "udunits"
   depends_on :x11

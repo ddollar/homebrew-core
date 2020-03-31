@@ -1,15 +1,15 @@
 class Utf8proc < Formula
   desc "Clean C library for processing UTF-8 Unicode data"
-  homepage "https://julialang.org/utf8proc/"
-  url "https://github.com/JuliaLang/utf8proc/archive/v2.1.tar.gz"
-  sha256 "241c409d8f6c0e4f332e41f3f1bd39552e36dcc00084fbacd03682b2969a301e"
+  homepage "https://juliastrings.github.io/utf8proc/"
+  url "https://github.com/JuliaStrings/utf8proc/archive/v2.4.0.tar.gz"
+  sha256 "b2e5d547c1d94762a6d03a7e05cea46092aab68636460ff8648f1295e2cdfbd7"
 
   bottle do
     cellar :any
-    sha256 "de1d4236a1db130052daf84f153ce0406919e9e123fad1b82d96c58e0720763a" => :high_sierra
-    sha256 "db3e01e947e412f480fd418562e78f07e9d92faa14b2bca453d445fc60156132" => :sierra
-    sha256 "f43d571eae1da6c1b2945cb6059234f4ed3879c911aa810543aae767f1e897ca" => :el_capitan
-    sha256 "9229016dc8952dd531ca8053fe5e5295c241cbb1cb93b02c7a2e0e550857c454" => :yosemite
+    sha256 "1f231714b571b71bb44282b94c0ab19c3ad8e7f4c57719bc9f963578011dfe1c" => :catalina
+    sha256 "5cbd1c95723915eda5c5bb0437f49c3aeb50d768cfec87e9ff09507912244589" => :mojave
+    sha256 "b1bbbd93be674c8304888ff5843a63433a5e3b7ccd7d8c8d9ceb450ce71a9c88" => :high_sierra
+    sha256 "447fe55565ddc9e411a78939b829d2a175f608ea0497eae069c86befef471d34" => :sierra
   end
 
   def install

@@ -1,20 +1,22 @@
 class Dtc < Formula
   desc "Device tree compiler"
   homepage "https://www.devicetree.org/"
-  url "https://www.kernel.org/pub/software/utils/dtc/dtc-1.4.6.tar.xz"
-  sha256 "382302bfcc3c40734be80ac620983971d911ec4cde798f551873f3eb008c7b7e"
+  url "https://www.kernel.org/pub/software/utils/dtc/dtc-1.6.0.tar.xz"
+  sha256 "10503b0217e1b07933e29e8d347a00015b2431bea5f59afe0bed3af30340c82d"
 
   bottle do
     cellar :any
-    sha256 "8b2e6b7f837522b3459f5a9a32fca23427868172100ee01cb8373e38ceff8cf3" => :high_sierra
-    sha256 "e34cbf3f0024346a9577249ec392f8a16576c356d74d3a96569b3e871a6eb514" => :sierra
-    sha256 "e1cc9f8201d537386c6d4ac3e68aaea9328cdbcd4f912c21c98d1a2fd1e17336" => :el_capitan
+    sha256 "3cbdb48bb892f6cce39b9cc381f60a9ad8a785ad3582a4f324be8ec4caed7423" => :catalina
+    sha256 "d80813f17abce4b20eb1e656919e9a5ee9d4fd10613b144c61217f3f1febf55c" => :mojave
+    sha256 "00273c1cc191558075437f3e1938977cbc22cc84c58bb6b8920acc672d25b85d" => :high_sierra
   end
 
+  depends_on "pkg-config" => :build
+
   def install
+    inreplace "libfdt/Makefile.libfdt", "libfdt.$(SHAREDLIB_EXT).1", "libfdt.1.$(SHAREDLIB_EXT)"
     system "make", "NO_PYTHON=1"
     system "make", "NO_PYTHON=1", "DESTDIR=#{prefix}", "PREFIX=", "install"
-    mv lib/"libfdt.dylib.1", lib/"libfdt.1.dylib"
   end
 
   test do

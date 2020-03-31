@@ -1,19 +1,19 @@
 class DatetimeFortran < Formula
   desc "Fortran time and date manipulation library"
-  homepage "https://github.com/milancurcic/datetime-fortran"
-  url "https://github.com/milancurcic/datetime-fortran/releases/download/v1.6.0/datetime-fortran-1.6.0.tar.gz"
-  sha256 "e46c583bca42e520a05180984315495495da4949267fc155e359524c2bf31e9a"
-  revision 2
+  homepage "https://github.com/wavebitscientific/datetime-fortran"
+  url "https://github.com/wavebitscientific/datetime-fortran/releases/download/v1.6.1/datetime-fortran-1.6.1.tar.gz"
+  sha256 "a503319209c6b9abe2fd0dc46f3b0d096154ac6edad9a106270f82aef6d248c0"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "887a64af4a2366598e0e374ddb664a303381c9ce849bff4de6297f522999daae" => :high_sierra
-    sha256 "b3106afade8eeb808df615f809a185ea9e7da4f01974b5ae39f244eb89ca4545" => :sierra
-    sha256 "39b4cbe4d95db475a36909c9d4241d3726523cab239f3b468c4fef6679abf1a0" => :el_capitan
+    sha256 "590d12115f8204c0d8de5300ea910bcfc30801645edb7b7fd3502202c85e933e" => :catalina
+    sha256 "160cac6100d26f5e09387daac49d16c40aedd38a44dc5aa0da950a62fc4f601b" => :mojave
+    sha256 "2b3663b87374f2aff2bbe1ddc6436a2e387cb0f158149fcc11f46b73aa530e89" => :high_sierra
+    sha256 "16073e773f18e30155af5805975b085fbd9c715cf0dcfe006cd1091de97c2cc5" => :sierra
   end
 
   head do
-    url "https://github.com/milancurcic/datetime-fortran.git"
+    url "https://github.com/wavebitscientific/datetime-fortran.git"
 
     depends_on "autoconf"   => :build
     depends_on "automake"   => :build

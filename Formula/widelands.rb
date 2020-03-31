@@ -1,36 +1,30 @@
 class Widelands < Formula
   desc "Free real-time strategy game like Settlers II"
-  homepage "https://wl.widelands.org/"
-  url "https://launchpad.net/widelands/build19/build19/+download/widelands-build19-src.tar.bz2"
-  sha256 "e511f9d26828a2b71b64cdfc6674e6e847543b2da73961ab882acca36c7c01a6"
-  revision 9
+  homepage "https://www.widelands.org/"
+  url "https://launchpad.net/widelands/build20/build20/+download/widelands-build20.tar.bz2"
+  sha256 "38594d98c74f357d4c31dd8ee2b056bfe921f42935935af915d11b792677bcb2"
+  revision 2
 
   bottle do
-    sha256 "e72bc4e255dc48c9a0dc066901b0efdaae326b22f8057061622a224fafbd7112" => :high_sierra
-    sha256 "ae23f5836cc6898cb9ee0582571d58a6cfcddd23951007a5ed40334da1cbf5b9" => :sierra
-    sha256 "be4f36e0ea0b262154c3cc879c4947be4c4d7c249ff73f483e9447b519c0eabf" => :el_capitan
+    sha256 "99de8c47d5824abd73dca688f63c4d9091b9423bf1d054b21c614e571ddbf329" => :catalina
+    sha256 "1c0c8a4cb4e3d2a9db80409c4ecaf4f5fecab339fd0c1bc55090a82d7ef344c4" => :mojave
+    sha256 "69e6610a6057de646d76598f1e9f21570f340293d3c69daa88c502750e60dab3" => :high_sierra
   end
 
   depends_on "cmake" => :build
   depends_on "boost"
-  depends_on "libpng"
-  depends_on "minizip"
+  depends_on "doxygen"
   depends_on "gettext"
+  depends_on "glew"
+  depends_on "icu4c"
+  depends_on "libpng"
+  depends_on "lua"
+  depends_on "minizip"
   depends_on "sdl2_image"
   depends_on "sdl2_mixer"
-  depends_on "sdl2_net"
   depends_on "sdl2_ttf"
-  depends_on "doxygen"
-  depends_on "glew"
-  depends_on "lua"
-  depends_on "icu4c"
-
-  needs :cxx11
 
   def install
-    # icu4c 61.1 compatability
-    ENV.append "CXXFLAGS", "-DU_USING_ICU_NAMESPACE=1"
-
     ENV.cxx11
     mkdir "build" do
       system "cmake", "..",

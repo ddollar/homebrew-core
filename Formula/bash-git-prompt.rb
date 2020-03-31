@@ -16,12 +16,13 @@ class BashGitPrompt < Formula
     doc.install "README.md"
   end
 
-  def caveats; <<~EOS
-    You should add the following to your .bashrc (or .bash_profile):
-      if [ -f "#{opt_share}/gitprompt.sh" ]; then
-        __GIT_PROMPT_DIR="#{opt_share}"
-        source "#{opt_share}/gitprompt.sh"
-      fi
+  def caveats
+    <<~EOS
+      You should add the following to your .bashrc (or .bash_profile):
+        if [ -f "#{opt_share}/gitprompt.sh" ]; then
+          __GIT_PROMPT_DIR="#{opt_share}"
+          source "#{opt_share}/gitprompt.sh"
+        fi
     EOS
   end
 

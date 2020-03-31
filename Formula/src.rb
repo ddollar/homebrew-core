@@ -1,18 +1,19 @@
 class Src < Formula
   desc "Simple revision control: RCS reloaded with a modern UI"
   homepage "http://www.catb.org/~esr/src/"
-  url "http://www.catb.org/~esr/src/src-1.17.tar.gz"
-  sha256 "1362068b46c035a8d19cafd12e3b23b8251c667bd98242f9c7b05b842f2c089d"
+  url "http://www.catb.org/~esr/src/src-1.27.tar.gz"
+  sha256 "7d587db28dbdaf644b9aaf6b1bb63d067e7db9410042ef76fdf492023d9bc41c"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "4a26b02a324638430eb06dccc9ff797cc33d9e5fb0a1313357210a06246a9617" => :high_sierra
-    sha256 "4a26b02a324638430eb06dccc9ff797cc33d9e5fb0a1313357210a06246a9617" => :sierra
-    sha256 "4a26b02a324638430eb06dccc9ff797cc33d9e5fb0a1313357210a06246a9617" => :el_capitan
+    sha256 "cceb553982a4cc0f3fafa72f7bf6622f017915b45bc595e1d588082309e66acb" => :catalina
+    sha256 "7ec8ababc34fa8abf7605cae18a22a67c97f8e8b322be6b983a41a1da9abb195" => :mojave
+    sha256 "7ec8ababc34fa8abf7605cae18a22a67c97f8e8b322be6b983a41a1da9abb195" => :high_sierra
+    sha256 "bccf5dd779b311958ce56f2ac2837b7226dc5e4aa8bfdb1c04e51688a9286107" => :sierra
   end
 
   head do
-    url "git://thyrsus.com/repositories/src.git"
+    url "https://gitlab.com/esr/src.git"
     depends_on "asciidoc" => :build
   end
 
@@ -27,8 +28,10 @@ class Src < Formula
   end
 
   test do
+    require "pty"
     (testpath/"test.txt").write "foo"
-    system "#{bin}/src", "commit", "-m", "hello", "test.txt"
-    system "#{bin}/src", "status", "test.txt"
+    PTY.spawn("sh", "-c", "#{bin}/src commit -m hello test.txt; #{bin}/src status test.txt") do |r, _w, _pid|
+      assert_match /^=\s*test.txt/, r.read
+    end
   end
 end

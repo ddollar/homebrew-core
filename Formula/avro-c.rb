@@ -1,24 +1,23 @@
 class AvroC < Formula
   desc "Data serialization system"
   homepage "https://avro.apache.org/"
-  url "https://www.apache.org/dyn/closer.cgi?path=avro/avro-1.8.2/c/avro-c-1.8.2.tar.gz"
-  sha256 "4639982b2b8fbd91fc7128fef672207129c959bb7900dd64b077ce4206edf10e"
+  url "https://www.apache.org/dyn/closer.lua?path=avro/avro-1.9.2/c/avro-c-1.9.2.tar.gz"
+  mirror "https://archive.apache.org/dist/avro/avro-1.9.2/c/avro-c-1.9.2.tar.gz"
+  sha256 "08697f7dc9ff52829ff90368628a80f6fd5c118004ced931211c26001e080cd2"
 
   bottle do
-    rebuild 1
-    sha256 "6f4d948dcf0e1700b7a770f9bb8612f5495ff0c5c01c9f0ee3a73f3d3c58165e" => :high_sierra
-    sha256 "b1340938b27551d73c1343d5323b9aa1a42a173fa10e4a7db9445e11e84fdc54" => :sierra
-    sha256 "8358b34088a77ba07d32505350e5b119274ed69f3adf1016cd1fbf0b15034227" => :el_capitan
+    sha256 "ad0ea0e835b07b6e2e9bf152c6a207a032b6aa6a99d7ba8c9df5463d39fb5eeb" => :catalina
+    sha256 "45832acdf64f958cfa8a84a5f2121a44ffefdb788b67a47c542e870198e60b63" => :mojave
+    sha256 "3c61ea219581bcd0386da82113d5f7998823852d662385b7da144ba4456d33ff" => :high_sierra
   end
 
-  option "with-snappy", "Build with Snappy codec support"
-  option "with-xz", "Build with LZMA codec support"
-
-  depends_on "pkg-config" => :build
   depends_on "cmake" => :build
+  depends_on "pkg-config" => :build
   depends_on "jansson"
-  depends_on "snappy" => :optional
-  depends_on "xz" => :optional
+  depends_on "snappy"
+  depends_on "xz"
+
+  uses_from_macos "zlib"
 
   def install
     system "cmake", ".", *std_cmake_args

@@ -1,14 +1,15 @@
 class Skafos < Formula
   desc "CLI for the Metis Machine A.I. and machine learning deployment platform"
-  homepage "https://metismachine.com/"
-  url "https://github.com/MetisMachine/skafos/archive/1.3.1.tar.gz"
-  sha256 "c5302db83be82497fb850c93f7c578eace23037bd3cc81ae887db32549284fd5"
+  homepage "https://skafos.ai/"
+  url "https://github.com/MetisMachine/skafos/archive/1.7.7.tar.gz"
+  sha256 "42eecd6094126f1e4febf94541c4b640f2b4ed39829af2686cd83a60fafcd994"
+  revision 2
 
   bottle do
     cellar :any
-    sha256 "b23ebd3db4ccb85cd82ad6e8bc5842da0c418fadb257a34958517b5913204e61" => :high_sierra
-    sha256 "aa7071e34230d60ba55e197829205f9ae15c13eea81c75b2937b8577f7f80547" => :sierra
-    sha256 "b3eda9fb29a11efafaad16e540efeadbbead13477fb72b9d805a3d91b97e9dc2" => :el_capitan
+    sha256 "2f1a06251a8e92a986afbefbfc380dd50c237bf0a59546ebcb89ee4f31b73e3a" => :catalina
+    sha256 "c487b351e95ab98ef03e4184020bda27b1cdc8353cfb505a54e75036731cfe0e" => :mojave
+    sha256 "57dc00bd0e8bfc96998c690cbd77a7c4c6486d50655603bfdf65771e340ee6b6" => :high_sierra
   end
 
   depends_on "cmake" => :build
@@ -42,6 +43,6 @@ class Skafos < Formula
         eof
       }
     EOS
-    assert_match "Invalid email or password", shell_output("expect -f test.exp")
+    assert_match "Please enter email", shell_output("expect -f test.exp")
   end
 end

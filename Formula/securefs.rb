@@ -1,15 +1,16 @@
 class Securefs < Formula
   desc "Filesystem with transparent authenticated encryption"
   homepage "https://github.com/netheril96/securefs"
-  url "https://github.com/netheril96/securefs/archive/0.8.1.tar.gz"
-  sha256 "f116f7bf66a0f65fce8ca3536ca2768076281ae8851c00343caa68504c5449e8"
+  url "https://github.com/netheril96/securefs.git",
+    :tag      => "0.9.0",
+    :revision => "cf84306e616f04aa3845db25e446df0f7c21416a"
   head "https://github.com/netheril96/securefs.git"
 
   bottle do
     cellar :any
-    sha256 "6824b2cfcfdc55cc79d1e01d6a958d55c082533e74d697b1db77815083a1e31b" => :high_sierra
-    sha256 "9a347b474fb48789d148e22ee2165224166c00161b2447cf2c6a8cf0a23326cb" => :sierra
-    sha256 "b15c75803225335e0465ccd66215d09d8194ebb1320072020cf21189c34266b4" => :el_capitan
+    sha256 "62611abe101f437d98e59c4b2311abd5645c32c15b57f22f195bc01c7df1d586" => :catalina
+    sha256 "7c9b57a3442b581e1a359035058e348fd51305e4c64113a16fb180c7932f96d9" => :mojave
+    sha256 "ea14d7b4f0ba48c4bdea31f42b0eabfe727a8e54eee923ee570698b5e1d3779f" => :high_sierra
   end
 
   depends_on "cmake" => :build

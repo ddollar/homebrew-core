@@ -1,18 +1,18 @@
 class Latex2html < Formula
   desc "LaTeX-to-HTML translator"
-  homepage "https://www.ctan.org/pkg/latex2html"
-  url "http://mirrors.ctan.org/support/latex2html/latex2html-2018.tar.gz"
-  sha256 "09e37526d169e77c266c23122348998a0841c3d50866e45ff2550128157ad4e2"
+  homepage "https://www.latex2html.org"
+  url "https://github.com/latex2html/latex2html/archive/v2020.tar.gz"
+  sha256 "414194e7c5164b447b72e1f70b9cfe3e2aeb0c60d81a84def6a8a08bf47c3771"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "85d6f0725f609bcb997296d58304a466b8a0ae7a21440953f822feea0b34f05f" => :high_sierra
-    sha256 "f1ee587fcf18d7c94eff2e0cc377e255f7a6c3495558438227e74a51d66a71d8" => :sierra
-    sha256 "484dc0ebe2273a16cf1f35bd76a1ef551eee16406fd5927d551c86a7a788212e" => :el_capitan
+    sha256 "67047d5b5d62383ce1aa89f7e686f597cc5681f73f70ff4cbcca7adb501a2fde" => :catalina
+    sha256 "09197aae2b56daffdec8b1310524a54bf5f150ba6b01028f9fbd9fc826a024ca" => :mojave
+    sha256 "505bfd350877a8cac8dbe37e3fc40eee907b896a1309ec379ba02ceabb32d929" => :high_sierra
   end
 
-  depends_on "netpbm"
   depends_on "ghostscript"
+  depends_on "netpbm"
 
   def install
     system "./configure", "--prefix=#{prefix}",

@@ -1,23 +1,20 @@
 class Urdfdom < Formula
   desc "Unified Robot Description Format (URDF) parser"
   homepage "https://wiki.ros.org/urdf/"
-  url "https://github.com/ros/urdfdom/archive/1.0.0.tar.gz"
-  sha256 "243ea925d434ebde0f9dee35ee5615ecc2c16151834713a01f85b97ac25991e1"
-  revision 1
+  url "https://github.com/ros/urdfdom/archive/1.0.4.tar.gz"
+  sha256 "8f3d56b0cbc4b84436d8baf4c8346cd2ee7ffb257bba5ddd9892c41bf516edc4"
 
   bottle do
     cellar :any
-    sha256 "ffe532a4d96689d515b46ac589afbb9e071a463250e65bbd9453d2db7e8e9eee" => :high_sierra
-    sha256 "8d4a25f145f4522f14b5085fdc7c3f6182237ee472a1b51e31e0093371f68acd" => :sierra
-    sha256 "03be42a92fe4a40b03ff648b45393ad6ca4db533286bdff32e3837862a326a1e" => :el_capitan
+    sha256 "63a07e52b44a13128d93ce7d124f1d6731dfab1a746535b37df7ea2be24e83fe" => :catalina
+    sha256 "b8efb5f82f50ce484f370e705bd9e1fc4d0d99e6e611a756d3b6c6d1a4b69ee0" => :mojave
+    sha256 "f3ff98a1d51ffe041808c3d5f4a67edded6ae41bc65124d041e42c2284b2b7dd" => :high_sierra
   end
 
   depends_on "cmake" => :build
   depends_on "console_bridge"
   depends_on "tinyxml"
   depends_on "urdfdom_headers"
-
-  needs :cxx11
 
   def install
     ENV.cxx11

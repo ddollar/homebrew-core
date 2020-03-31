@@ -1,18 +1,17 @@
 class Libsigcxx < Formula
   desc "Callback framework for C++"
-  homepage "https://libsigc.sourceforge.io"
-  url "https://download.gnome.org/sources/libsigc++/2.10/libsigc++-2.10.0.tar.xz"
-  sha256 "f843d6346260bfcb4426259e314512b99e296e8ca241d771d21ac64f28298d81"
+  homepage "https://libsigcplusplus.github.io/libsigcplusplus/"
+  url "https://download.gnome.org/sources/libsigc++/3.0/libsigc++-3.0.2.tar.xz"
+  sha256 "4b77676de1e74774ec456bcc6ac6f04a2791a12cc1fe07f8305d4c3c86e2f339"
 
   bottle do
     cellar :any
-    sha256 "90fd6c21c7a1d78b2efd494942e578a942acd6c38a7b3d758d05130df44ce3be" => :high_sierra
-    sha256 "58af260cf09d48886e9e6c8d85d81979ebdaba4abcfa0bbc4a3a9ab3f78dd929" => :sierra
-    sha256 "21124a48471cafc82ee203113e368db1b667e4dc6111e66f624af986c88d72ef" => :el_capitan
-    sha256 "3441b2001c4e0aa51dae34d36a95db87a580229a6e68ae45f668b3d572a8f9cc" => :yosemite
+    sha256 "793bb22cf3d7566a5ee346dd110fd2eba97b1ac91c16a9846ffb54af59cc43aa" => :catalina
+    sha256 "02ea0ed1876ad347cdc1a4b0223066f6fb5ced0dd955373834aa2da68404aad7" => :mojave
+    sha256 "ab541bdf6cb5d8c223213796054db86e8896c11fe3a68c79a2a179d85b019751" => :high_sierra
   end
 
-  needs :cxx11
+  depends_on :macos => :high_sierra # needs C++17
 
   def install
     ENV.cxx11
@@ -23,18 +22,25 @@ class Libsigcxx < Formula
   end
   test do
     (testpath/"test.cpp").write <<~EOS
+      #include <iostream>
+      #include <string>
       #include <sigc++/sigc++.h>
 
-      void somefunction(int arg) {}
+      void on_print(const std::string& str) {
+        std::cout << str;
+      }
 
-      int main(int argc, char *argv[])
-      {
-         sigc::slot<void, int> sl = sigc::ptr_fun(&somefunction);
-         return 0;
+      int main(int argc, char *argv[]) {
+        sigc::signal<void(const std::string&)> signal_print;
+
+        signal_print.connect(sigc::ptr_fun(&on_print));
+
+        signal_print.emit("hello world\\n");
+        return 0;
       }
     EOS
-    system ENV.cxx, "-std=c++11", "test.cpp",
-                   "-L#{lib}", "-lsigc-2.0", "-I#{include}/sigc++-2.0", "-I#{lib}/sigc++-2.0/include", "-o", "test"
-    system "./test"
+    system ENV.cxx, "-std=c++17", "test.cpp",
+                   "-L#{lib}", "-lsigc-3.0", "-I#{include}/sigc++-3.0", "-I#{lib}/sigc++-3.0/include", "-o", "test"
+    assert_match "hello world", shell_output("./test")
   end
 end

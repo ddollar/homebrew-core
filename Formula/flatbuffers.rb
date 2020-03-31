@@ -1,15 +1,15 @@
 class Flatbuffers < Formula
   desc "Serialization library for C++, supporting Java, C#, and Go"
   homepage "https://google.github.io/flatbuffers"
-  url "https://github.com/google/flatbuffers/archive/v1.8.0.tar.gz"
-  sha256 "c45029c0a0f1a88d416af143e34de96b3091642722aa2d8c090916c6d1498c2e"
+  url "https://github.com/google/flatbuffers/archive/v1.12.0.tar.gz"
+  sha256 "62f2223fb9181d1d6338451375628975775f7522185266cd5296571ac152bc45"
   head "https://github.com/google/flatbuffers.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "30cb86dad1fb7c161775e66436d7143e89771f8286a23b04d10ac3b119eb902f" => :high_sierra
-    sha256 "c04972a0e433229877a65e01bf700fc5326d6a7318887a5269e7437ff6274fc9" => :sierra
-    sha256 "cc9fa90cb4d4ac9744512297e8121cb2fd493b4b081902c3feaff715b9923a77" => :el_capitan
+    sha256 "6af7ac37134539beb7c1003bd2cf8d1e530606cac616239acf4d2b1df31b0dbc" => :catalina
+    sha256 "270bebda4048754554cd587d48db10ee5fe1a2795ef6e881cafd1b8f90c7af78" => :mojave
+    sha256 "f45982e6ca71b10e59c607b9d984108e1b18fc84b8c52dd23325b6b9211e407f" => :high_sierra
   end
 
   depends_on "cmake" => :build
@@ -20,47 +20,49 @@ class Flatbuffers < Formula
   end
 
   test do
-    def testfbs; <<~EOS
-      // example IDL file
+    def testfbs
+      <<~EOS
+        // example IDL file
 
-      namespace MyGame.Sample;
+        namespace MyGame.Sample;
 
-      enum Color:byte { Red = 0, Green, Blue = 2 }
+        enum Color:byte { Red = 0, Green, Blue = 2 }
 
-      union Any { Monster }  // add more elements..
+        union Any { Monster }  // add more elements..
 
-        struct Vec3 {
-          x:float;
-          y:float;
-          z:float;
-        }
+          struct Vec3 {
+            x:float;
+            y:float;
+            z:float;
+          }
 
-        table Monster {
-          pos:Vec3;
-          mana:short = 150;
-          hp:short = 100;
-          name:string;
-          friendly:bool = false (deprecated);
-          inventory:[ubyte];
-          color:Color = Blue;
-        }
+          table Monster {
+            pos:Vec3;
+            mana:short = 150;
+            hp:short = 100;
+            name:string;
+            friendly:bool = false (deprecated);
+            inventory:[ubyte];
+            color:Color = Blue;
+          }
 
-      root_type Monster;
+        root_type Monster;
 
       EOS
     end
     (testpath/"test.fbs").write(testfbs)
 
-    def testjson; <<~EOS
-      {
-        pos: {
-          x: 1,
-          y: 2,
-          z: 3
-        },
-        hp: 80,
-        name: "MyMonster"
-      }
+    def testjson
+      <<~EOS
+        {
+          pos: {
+            x: 1,
+            y: 2,
+            z: 3
+          },
+          hp: 80,
+          name: "MyMonster"
+        }
       EOS
     end
     (testpath/"test.json").write(testjson)

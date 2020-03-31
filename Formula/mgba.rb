@@ -1,33 +1,19 @@
 class Mgba < Formula
   desc "Game Boy Advance emulator"
   homepage "https://mgba.io/"
-  revision 2
+  url "https://github.com/mgba-emu/mgba/archive/0.8.1.tar.gz"
+  sha256 "df136ea50c9cca380ab93e00fd8d87811e41a49a804c5b0e018babef0c490f13"
   head "https://github.com/mgba-emu/mgba.git"
 
-  stable do
-    url "https://github.com/mgba-emu/mgba/archive/0.6.1.tar.gz"
-    sha256 "7c78feb0aa12930b993ca1b220d282ed178e306621559e48bb168623030eb876"
-
-    # Remove for > 0.6.1
-    # Fix "MemoryModel.cpp:102:15: error: no viable overloaded '='"
-    # Upstream commit from 11 Dec 2017 "Qt: Fix build with Qt 5.10"
-    patch do
-      url "https://github.com/mgba-emu/mgba/commit/e31373560.patch?full_index=1"
-      sha256 "5311b19dea0848772bdd00b354f9fca741b2bfd2cf65eab8a8c556e6fb748b8e"
-    end
-  end
-
   bottle do
-    cellar :any
-    sha256 "225961abcc72b538b35be18e5348a5af0c0f6fe46b0daef9b581594b26a6b0d0" => :high_sierra
-    sha256 "79d5e25543474d0715a369cfbe862f1c8d79b79c260a7cecdba2f38f6031f42d" => :sierra
-    sha256 "9b7ad131ba17d492c53af30d996aeaac3814acd810aa5f3f9a73bfe098727ca4" => :el_capitan
+    sha256 "74846398875420c4fb877be7c646753b852f747c749dee8d9e67c4c64d42941d" => :catalina
+    sha256 "ded67173cd9422c5eedf350f740139fdbb6ff80f4d7024098f407c0566296a40" => :mojave
+    sha256 "bd290fed1f0f69cdf857fd3f8f7bb41f92c1d50b8af41044407e2daa9b4a2599" => :high_sierra
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
   depends_on "ffmpeg"
-  depends_on "imagemagick"
   depends_on "libepoxy"
   depends_on "libpng"
   depends_on "libzip"
@@ -37,9 +23,7 @@ class Mgba < Formula
   def install
     # Fix "error: 'future<void>' is unavailable: introduced in macOS 10.8"
     # Reported 11 Dec 2017 https://github.com/mgba-emu/mgba/issues/944
-    if MacOS.version <= :el_capitan
-      ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version
-    end
+    ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version if MacOS.version <= :el_capitan
 
     # Install .app bundle into prefix, not prefix/Applications
     inreplace "src/platform/qt/CMakeLists.txt", "Applications", "."

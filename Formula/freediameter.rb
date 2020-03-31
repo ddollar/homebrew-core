@@ -1,38 +1,27 @@
 class Freediameter < Formula
   desc "Open source Diameter (Authentication) protocol implementation"
   homepage "http://www.freediameter.net"
-  url "http://www.freediameter.net/hg/freeDiameter/archive/1.2.1.tar.gz"
-  sha256 "bd7f105542e9903e776aa006c6931c1f5d3d477cb59af33a9162422efa477097"
+  url "http://www.freediameter.net/hg/freeDiameter/archive/1.3.2.tar.gz"
+  sha256 "ce05b4bf2a04cd2f472e77ba4b86fbfca690bfc83e51da8ce0e575804b763eda"
   head "http://www.freediameter.net/hg/freeDiameter", :using => :hg
 
   bottle do
-    sha256 "8a16e612b93ae8a1c55fe090f0301a7d778c858730a144c152aa6eb8080d8c68" => :high_sierra
-    sha256 "615bfb731e99779234533bed9f6def01487783e1b1b22f3f6d41efceef1899bb" => :sierra
-    sha256 "6d562bd62780a6b942b6ca3b4b1807a6ac3eef80209748b6748bcbc8b6b389b5" => :el_capitan
+    cellar :any
+    sha256 "8c60c4c5831c6d3a538a130a7aea101b6dc8d2f0351c6c1cd418b534cb97f366" => :catalina
+    sha256 "aacb7d5749e234dd8937365b3b493b593a4fc1be5d70c9aed95596b8b238f46d" => :mojave
+    sha256 "e194caf5035629cf10d8872e0c21ca86b8b4f4ae6665ce2d4a424ee2ea5794fb" => :high_sierra
+    sha256 "0f1a491d96a02003555ee8101b6e8d25e580bc8416bb1cdb4f877950dd0a3986" => :sierra
   end
-
-  option "with-all-extensions", "Enable all extensions"
 
   depends_on "cmake" => :build
   depends_on "gnutls"
   depends_on "libgcrypt"
   depends_on "libidn"
 
-  if build.with? "all-extensions"
-    depends_on "swig" => :build
-    depends_on "postgresql"
-    depends_on "mysql"
-  end
-
   def install
-    args = std_cmake_args + %W[
-      -DDEFAULT_CONF_PATH=#{etc}
-      -DDISABLE_SCTP=ON
-    ]
-    args << "-DALL_EXTENSIONS=ON" if build.with? "all-extensions"
-
     mkdir "build" do
-      system "cmake", "..", *args
+      system "cmake", "..", *std_cmake_args, "-DDEFAULT_CONF_PATH=#{etc}",
+                      "-DDISABLE_SCTP=ON"
       system "make"
       system "make", "install"
     end
@@ -47,38 +36,40 @@ class Freediameter < Formula
     cp doc/"freediameter.conf.sample", etc/"freeDiameter.conf"
   end
 
-  def caveats; <<~EOS
-    To configure freeDiameter, edit #{etc}/freeDiameter.conf to taste.
+  def caveats
+    <<~EOS
+      To configure freeDiameter, edit #{etc}/freeDiameter.conf to taste.
 
-    Sample configuration files can be found in #{doc}.
+      Sample configuration files can be found in #{doc}.
 
-    For more information about freeDiameter configuration options, read:
-      http://www.freediameter.net/trac/wiki/Configuration
+      For more information about freeDiameter configuration options, read:
+        http://www.freediameter.net/trac/wiki/Configuration
 
-    Other potentially useful files can be found in #{opt_pkgshare}/contrib.
+      Other potentially useful files can be found in #{opt_pkgshare}/contrib.
     EOS
   end
 
   plist_options :startup => true
 
-  def plist; <<~EOS
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    <plist version="1.0">
-      <dict>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_bin}/freeDiameterd</string>
-        </array>
-        <key>KeepAlive</key>
+  def plist
+    <<~EOS
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
         <dict>
-          <key>NetworkState</key>
-          <true/>
+          <key>Label</key>
+          <string>#{plist_name}</string>
+          <key>ProgramArguments</key>
+          <array>
+            <string>#{opt_bin}/freeDiameterd</string>
+          </array>
+          <key>KeepAlive</key>
+          <dict>
+            <key>NetworkState</key>
+            <true/>
+          </dict>
         </dict>
-      </dict>
-    </plist>
+      </plist>
     EOS
   end
 

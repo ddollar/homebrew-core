@@ -2,16 +2,15 @@ class SourceToImage < Formula
   desc "Tool for building source and injecting into docker images"
   homepage "https://github.com/openshift/source-to-image"
   url "https://github.com/openshift/source-to-image.git",
-    :tag => "v1.1.9a",
-    :revision => "40ad911db82b8720f9956e8aa76371a8f185a6de"
-  version "1.1.9a"
+      :tag      => "v1.3.0",
+      :revision => "ecf5524df96eb4def4db8ef0969a9630e59ec890"
   head "https://github.com/openshift/source-to-image.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "2bbf475e6ce03ad31a67e85a9058b071d52df49ac878afaafa073629764cf838" => :high_sierra
-    sha256 "1e7142bddd6ca1dc988ebdd20ae35bf927d6169d5390eb67bc183c585cef6391" => :sierra
-    sha256 "d000c952d0decf6ce5c8adee1b549bd268e47bb7b7e665f2e91c4b97789f6e84" => :el_capitan
+    sha256 "8e977cfd4aff9c6867f74ce430187857f8f2a37d33c672d8e45b885005a4d181" => :catalina
+    sha256 "568e6d711462191b0bc8629ad0c69bd24967fa83f1b0dcfcce9aee1e42dbdfd7" => :mojave
+    sha256 "eabf5777a98f3e6e363ae664e0d19002bd92722ca980d3d119bde4dfcb9c921b" => :high_sierra
   end
 
   depends_on "go" => :build

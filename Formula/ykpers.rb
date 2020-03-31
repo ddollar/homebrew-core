@@ -1,19 +1,20 @@
 class Ykpers < Formula
   desc "YubiKey personalization library and tool"
   homepage "https://developers.yubico.com/yubikey-personalization/"
-  url "https://developers.yubico.com/yubikey-personalization/Releases/ykpers-1.18.1.tar.gz"
-  sha256 "9ffdb938121a867aa0b350b49daff5807884c2268dfe6d245d133474cd9c5256"
+  url "https://developers.yubico.com/yubikey-personalization/Releases/ykpers-1.20.0.tar.gz"
+  sha256 "0ec84d0ea862f45a7d85a1a3afe5e60b8da42df211bb7d27a50f486e31a79b93"
 
   bottle do
     cellar :any
-    sha256 "011f869e3fdb84bf0f5aecece6b78f6351d56b17b0cced168c00b2ea7d1178f0" => :high_sierra
-    sha256 "402163cec22f6456311c4c40141bb09ca6f5e6aa2a25b828ca6be7eaea78bf65" => :sierra
-    sha256 "f36ef2cf81878daa403b270eda166280e11af6c0f74c8999f63a0be890f6f086" => :el_capitan
+    sha256 "0b11199f0ee0d96c456d700043073eaea499a2e379ce21ce3fd13fe826f3a667" => :catalina
+    sha256 "5a77e8978ad9cf3ed1d596d5ec209cf94a4eb1f13ec7b7b228847c6d6241e662" => :mojave
+    sha256 "5907731c71ecd35c52caebbda5b1cd2bca595a06d2a1571c3ffeadb745e33054" => :high_sierra
+    sha256 "1f2863cf8132643dc9c3572b649792430d3fc932a5e6d49709a7076b10718d8c" => :sierra
   end
 
   depends_on "pkg-config" => :build
+  depends_on "json-c"
   depends_on "libyubikey"
-  depends_on "json-c" => :recommended
 
   def install
     libyubikey_prefix = Formula["libyubikey"].opt_prefix

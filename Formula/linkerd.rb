@@ -1,83 +1,52 @@
 class Linkerd < Formula
-  desc "Drop-in RPC proxy designed for microservices"
-  homepage "https://linkerd.io/"
-  url "https://github.com/linkerd/linkerd/releases/download/1.3.6/linkerd-1.3.6.tgz"
-  sha256 "71c07cfad5eaf7f30d7f424723e5135495ddf6782919d69bc0c6de0780d0f09d"
+  desc "Command-line utility to interact with linkerd"
+  homepage "https://linkerd.io"
 
-  bottle :unneeded
+  url "https://github.com/linkerd/linkerd2.git",
+    :tag      => "stable-2.7.0",
+    :revision => "b9caae0cd9c28abe9542c77a2883ce1ef524e7b8"
 
-  depends_on :java => "1.8+"
+  bottle do
+    cellar :any_skip_relocation
+    sha256 "70d055275c280f4bdfd62aa95b79a1d3e68ec87de26fda2927d1902edb16dc90" => :catalina
+    sha256 "689913101115c9ad74e97cba76160e68ba92bb58d7384cf7e42d0faa23533bd3" => :mojave
+    sha256 "588139f4dc9bc11cb7f4230d44a154c9a50ce924f2a36b556ad90a5b0c5ce714" => :high_sierra
+  end
+
+  depends_on "go@1.12" => :build
 
   def install
-    inreplace "config/linkerd.yaml", "disco", etc/"linkerd/disco"
+    ENV["GOPATH"] = buildpath
+    ENV["CI_FORCE_CLEAN"] = "1"
 
-    libexec.install "linkerd-#{version}-exec"
-    bin.install_symlink libexec/"linkerd-#{version}-exec" => "linkerd"
+    srcpath = buildpath/"src/github.com/linkerd/linkerd2"
+    srcpath.install buildpath.children - [buildpath/".brew_home"]
 
-    pkgshare.mkpath
-    cp buildpath/"config/linkerd.yaml", pkgshare/"default.yaml"
+    cd srcpath do
+      system "bin/build-cli-bin"
+      bin.install "target/cli/darwin/linkerd"
 
-    etc.install "config" => "linkerd"
-    etc.install "disco" => "linkerd/disco"
-    libexec.install_symlink etc/"linkerd" => "config"
-    libexec.install_symlink etc/"linkerd/disco" => "disco"
+      # Install bash completion
+      output = Utils.popen_read("#{bin}/linkerd completion bash")
+      (bash_completion/"linkerd").write output
 
-    share.install "docs"
-  end
+      # Install zsh completion
+      output = Utils.popen_read("#{bin}/linkerd completion zsh")
+      (zsh_completion/"linkerd").write output
 
-  def post_install
-    (var/"log/linkerd").mkpath
-  end
-
-  plist_options :manual => "linkerd #{HOMEBREW_PREFIX}/etc/linkerd/linkerd.yaml"
-
-  def plist; <<~EOS
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    <plist version="1.0">
-    <dict>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>WorkingDirectory</key>
-        <string>#{HOMEBREW_PREFIX}</string>
-        <key>ProgramArguments</key>
-        <array>
-            <string>#{opt_bin}/linkerd</string>
-            <string>#{etc}/linkerd/linkerd.yaml</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>KeepAlive</key>
-        <true/>
-        <key>StandardErrorPath</key>
-        <string>#{var}/log/linkerd/linkerd.log</string>
-        <key>StandardOutPath</key>
-        <string>#{var}/log/linkerd/linkerd.log</string>
-    </dict>
-    </plist>
-    EOS
+      prefix.install_metafiles
+    end
   end
 
   test do
-    (testpath/"index.html").write "It works!"
+    run_output = shell_output("#{bin}/linkerd 2>&1")
+    assert_match "linkerd manages the Linkerd service mesh.", run_output
 
-    simple_http_pid = fork do
-      exec "python -m SimpleHTTPServer 9999"
-    end
-    linkerd_pid = fork do
-      exec "#{bin}/linkerd #{pkgshare}/default.yaml"
-    end
+    version_output = shell_output("#{bin}/linkerd version --client 2>&1")
+    assert_match "Client version: ", version_output
+    stable_resource = stable.instance_variable_get(:@resource)
+    assert_match stable_resource.instance_variable_get(:@specs)[:tag], version_output if build.stable?
 
-    sleep 10
-
-    begin
-      assert_match /It works!/, shell_output("curl -s -H 'Host: web' http://localhost:4140")
-      assert_match /Bad Gateway/, shell_output("curl -s -I -H 'Host: foo' http://localhost:4140")
-    ensure
-      Process.kill("TERM", linkerd_pid)
-      Process.wait(linkerd_pid)
-      Process.kill("TERM", simple_http_pid)
-      Process.wait(simple_http_pid)
-    end
+    system "#{bin}/linkerd", "install", "--ignore-cluster"
   end
 end

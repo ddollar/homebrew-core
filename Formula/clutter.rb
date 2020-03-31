@@ -1,25 +1,24 @@
 class Clutter < Formula
   desc "Generic high-level canvas library"
   homepage "https://wiki.gnome.org/Projects/Clutter"
-  url "https://download.gnome.org/sources/clutter/1.26/clutter-1.26.2.tar.xz"
-  sha256 "e7233314983055e9018f94f56882e29e7fc34d8d35de030789fdcd9b2d0e2e56"
-  revision 1
+  url "https://download.gnome.org/sources/clutter/1.26/clutter-1.26.4.tar.xz"
+  sha256 "8b48fac159843f556d0a6be3dbfc6b083fc6d9c58a20a49a6b4919ab4263c4e6"
 
   bottle do
-    sha256 "cd1bad834964168854f060603548fb495a629cbf98a119050cb1ff2a4ef41b67" => :high_sierra
-    sha256 "feebbe98a8c3cc1ad25202719451b4e9db64c145583ea1bd3b0d540e23cc8bf6" => :sierra
-    sha256 "fe6f945a3aac285dd0f21d1bdf0e4da08ac179c7cde03198af98c69166ccce6e" => :el_capitan
+    sha256 "ccec39ce9c941de753798e466b8cfc2a69612319d8b5a422f6e4bde49db305b1" => :catalina
+    sha256 "43da6f50107059a3c9b215e77d29724f9e71a17fd89f5e72a200cd021e32f471" => :mojave
+    sha256 "2a1f93e956dbfc9dc4f3c47dd8923b224ed155f3b8dbf32df74f365a65052bbb" => :high_sierra
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "pkg-config" => :build
-  depends_on "glib"
-  depends_on "gdk-pixbuf"
-  depends_on "cogl"
-  depends_on "cairo" # for cairo-gobject
   depends_on "atk"
-  depends_on "pango"
+  depends_on "cairo" # for cairo-gobject
+  depends_on "cogl"
+  depends_on "gdk-pixbuf"
+  depends_on "glib"
   depends_on "json-glib"
+  depends_on "pango"
 
   def install
     args = %W[
@@ -56,6 +55,7 @@ class Clutter < Formula
     freetype = Formula["freetype"]
     gettext = Formula["gettext"]
     glib = Formula["glib"]
+    harfbuzz = Formula["harfbuzz"]
     json_glib = Formula["json-glib"]
     libpng = Formula["libpng"]
     pango = Formula["pango"]
@@ -69,6 +69,7 @@ class Clutter < Formula
       -I#{gettext.opt_include}
       -I#{glib.opt_include}/glib-2.0
       -I#{glib.opt_lib}/glib-2.0/include
+      -I#{harfbuzz.opt_include}/harfbuzz
       -I#{include}/clutter-1.0
       -I#{json_glib.opt_include}/json-glib-1.0
       -I#{libpng.opt_include}/libpng16

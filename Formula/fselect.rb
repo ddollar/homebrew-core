@@ -1,24 +1,24 @@
 class Fselect < Formula
   desc "Find files with SQL-like queries"
   homepage "https://github.com/jhspetersson/fselect"
-  url "https://github.com/jhspetersson/fselect/archive/0.3.2.tar.gz"
-  sha256 "9aef280de65b8ffd91993c6eb6321c8fdec4281f3490b070da832b307f8ded1b"
+  url "https://github.com/jhspetersson/fselect/archive/0.6.9.tar.gz"
+  sha256 "8a280ccd96c9aa0b638065eb4d17e9e75a185a89afb56d0bae522645bd8b3c66"
 
   bottle do
-    sha256 "f766c8896858032abb1d65559ffa4b09b2e508e3de51a570c509abd98aeb7e29" => :high_sierra
-    sha256 "dde34dd1ee08a272a40452ee51028fcb06589f0cc817745af811bd2b00707647" => :sierra
-    sha256 "4a6ee623a2d226fe63f316dc52ea9f14ed152a2943122ff40a02f93174f1bd77" => :el_capitan
+    cellar :any_skip_relocation
+    sha256 "64da9563e3aa17c48574a8ddcedeb3b86d69bb7e9c9bbdd705e37de2e682380a" => :catalina
+    sha256 "72bfe29d9c29b6d3592074b18142289e629b43e017c9c2c7bf3ddac573d4ec0f" => :mojave
+    sha256 "2499034e2890a202bd7aff3a71a0cb5d6d75d55be3852861384db0bb7443cc4f" => :high_sierra
   end
 
   depends_on "rust" => :build
 
   def install
-    system "cargo", "build", "--release"
-    bin.install "target/release/fselect"
+    system "cargo", "install", "--locked", "--root", prefix, "--path", "."
   end
 
   test do
-    (testpath/"test.txt").write("")
+    touch testpath/"test.txt"
     cmd = "#{bin}/fselect name from . where name = '*.txt'"
     assert_match "test.txt", shell_output(cmd).chomp
   end

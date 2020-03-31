@@ -1,7 +1,7 @@
 class Zbar < Formula
   desc "Suite of barcodes-reading tools"
   homepage "https://zbar.sourceforge.io"
-  revision 8
+  revision 10
 
   stable do
     url "https://downloads.sourceforge.net/project/zbar/zbar/0.10/zbar-0.10.tar.bz2"
@@ -15,29 +15,28 @@ class Zbar < Formula
 
   bottle do
     cellar :any
-    sha256 "5929b876b1536e7b4c75ea08e52a94aafb43326bdfda8258929929a867e8f15d" => :high_sierra
-    sha256 "86a824f7c99c057389d03591a665a85d975e43f7296bf2a26e8bd7664846562a" => :sierra
-    sha256 "b30c6de3d4194cfe20e054cb2f3aa271766f1147da91295bf03db9c422384a7d" => :el_capitan
+    sha256 "c67f6e8064b2c29e707529c211d90499452391ab05739da4774d922f643dd1a3" => :catalina
+    sha256 "17da6d6bbc5072ee46a84b3fed3259afcdc96eabb50988363aa1c13d6437ec4d" => :mojave
+    sha256 "fdba8cdcefcf962f2da1d475bd6556d3bdc3b0f644e3684a0a46efb1dd778fe2" => :high_sierra
   end
 
   head do
     url "https://github.com/ZBar/ZBar.git"
 
-    depends_on "gettext" => :build
-    depends_on "automake" => :build
     depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "gettext" => :build
     depends_on "libtool" => :build
     depends_on "xmlto" => :build
   end
 
-  depends_on :x11 => :optional
   depends_on "pkg-config" => :build
-  depends_on "jpeg"
+  depends_on "freetype"
   depends_on "imagemagick"
+  depends_on "jpeg"
+  depends_on "libtool"
   depends_on "ufraw"
   depends_on "xz"
-  depends_on "freetype"
-  depends_on "libtool"
 
   def install
     if build.head?
@@ -59,13 +58,8 @@ class Zbar < Formula
       --without-qt
       --disable-video
       --without-gtk
+      --without-x
     ]
-
-    if build.with? "x11"
-      args << "--with-x"
-    else
-      args << "--without-x"
-    end
 
     system "./configure", *args
     system "make", "install"

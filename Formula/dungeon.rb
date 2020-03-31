@@ -3,12 +3,14 @@ class Dungeon < Formula
   homepage "https://github.com/GOFAI/dungeon"
   url "https://github.com/GOFAI/dungeon/archive/4.0.tar.gz"
   sha256 "be2217be9e23861f22c14c4395da272fca5fb08a1741f52fd393792908279bea"
-  revision 2
+  revision 4
 
   bottle do
-    sha256 "0e6d683ff9e65ebc5dec90c76075666d80979147aede32deb8b0485cda9ada3f" => :high_sierra
-    sha256 "4c033c6809253783c4070c334cf03dc2a200ae16d4e3d84c9bd615d177ce4bee" => :sierra
-    sha256 "930b36aaf10a0f541e641909769f230346ec10752161282d925235bcad2dabc6" => :el_capitan
+    cellar :any
+    sha256 "f3430523323ddfc9c13f0040cfdb4ca2c89669c04abd9ff5beb224f34cb69273" => :catalina
+    sha256 "cfac4e3fa4aa3c2e110bc59f6ebe90969b269a276e21a0e068ab645d3c72aae3" => :mojave
+    sha256 "c2647f1348a819bd2ea493dc9655188cec00648aa897fc9d67211c7890e016b8" => :high_sierra
+    sha256 "97f4cd4a4f424ca0469e34a0f0aa0c0a218c9d339c12160a749cb63f4ba4ce2d" => :sierra
   end
 
   depends_on "gcc" # for gfortran

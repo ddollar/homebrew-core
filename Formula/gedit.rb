@@ -1,49 +1,53 @@
 class Gedit < Formula
   desc "The GNOME text editor"
   homepage "https://wiki.gnome.org/Apps/Gedit"
-  url "https://download.gnome.org/sources/gedit/3.28/gedit-3.28.0.tar.xz"
-  sha256 "9bf90a2d4fd7be802ad98d226d254ad42057b7c5cc03d1cd39b813123fa8ca5f"
-  revision 1
+  url "https://download.gnome.org/sources/gedit/3.36/gedit-3.36.0.tar.xz"
+  sha256 "c983dd12a4e9db7af1aaa3062e6f042811ef99a4d6382659096f2ef8fc559435"
 
   bottle do
-    sha256 "8e27779dbba10a76a566708b85ab4d69698911634a0f40ad752bb2676eb64031" => :high_sierra
-    sha256 "267bcea70b262c246baa387f57f92f007cf658181c7d0c74c75d50a422b23897" => :sierra
-    sha256 "1e11af4f72e4403021a6caba8c092b315f9d8f89046046e5afceb082f92e695c" => :el_capitan
+    sha256 "27300727b546549c379cd116e54fbf4322139d10ab0e661c1c2c5289b7e0afed" => :catalina
+    sha256 "cfc9bd9e8c9cdec2ed73e84db3f1a1afb74a4d89ed86c5c284d4eafc872a3985" => :mojave
+    sha256 "a6f422581c87419f30e313fc124e884af5a887c00b92ecc589559d35ca783b8b" => :high_sierra
   end
 
+  depends_on "itstool" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkg-config" => :build
   depends_on "vala" => :build
-  depends_on "intltool" => :build
-  depends_on "itstool" => :build
+  depends_on "adwaita-icon-theme"
   depends_on "atk"
   depends_on "cairo"
   depends_on "gdk-pixbuf"
   depends_on "gettext"
   depends_on "glib"
-  depends_on "pango"
-  depends_on "gtk+3"
-  depends_on "gtk-mac-integration"
   depends_on "gobject-introspection"
-  depends_on "gspell"
-  depends_on "iso-codes"
-  depends_on "libxml2"
-  depends_on "libpeas"
-  depends_on "gtksourceview3"
   depends_on "gsettings-desktop-schemas"
-  depends_on "adwaita-icon-theme"
+  depends_on "gspell"
+  depends_on "gtk+3"
+  depends_on "gtksourceview4"
+  depends_on "libpeas"
+  depends_on "libsoup"
+  depends_on "libxml2"
+  depends_on "pango"
+  depends_on "tepl"
+
+  # see https://gitlab.gnome.org/GNOME/gedit/-/merge_requests/74
+  patch :DATA
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--disable-updater",
-                          "--disable-schemas-compile",
-                          "--disable-python"
-    system "make", "install"
+    ENV["DESTDIR"] = "/"
+
+    mkdir "build" do
+      system "meson", "--prefix=#{prefix}", ".."
+      system "ninja", "-v"
+      system "ninja", "install", "-v"
+    end
   end
 
   def post_install
     system "#{Formula["glib"].opt_bin}/glib-compile-schemas", "#{HOMEBREW_PREFIX}/share/glib-2.0/schemas"
+    system "#{Formula["gtk+3"].opt_bin}/gtk3-update-icon-cache", "-qtf", "#{HOMEBREW_PREFIX}/share/icons/hicolor"
   end
 
   test do
@@ -68,7 +72,8 @@ class Gedit < Formula
     glib = Formula["glib"]
     gobject_introspection = Formula["gobject-introspection"]
     gtkx3 = Formula["gtk+3"]
-    gtksourceview3 = Formula["gtksourceview3"]
+    gtksourceview4 = Formula["gtksourceview4"]
+    harfbuzz = Formula["harfbuzz"]
     libepoxy = Formula["libepoxy"]
     libffi = Formula["libffi"]
     libpeas = Formula["libpeas"]
@@ -86,9 +91,10 @@ class Gedit < Formula
       -I#{glib.opt_include}/glib-2.0
       -I#{glib.opt_lib}/glib-2.0/include
       -I#{gobject_introspection.opt_include}/gobject-introspection-1.0
-      -I#{gtksourceview3.opt_include}/gtksourceview-3.0
+      -I#{gtksourceview4.opt_include}/gtksourceview-4
       -I#{gtkx3.opt_include}/gtk-3.0
-      -I#{include}/gedit-3.14
+      -I#{harfbuzz.opt_include}/harfbuzz
+      -I#{include}/gedit-3.36
       -I#{libepoxy.opt_include}
       -I#{libffi.opt_lib}/libffi-3.0.13/include
       -I#{libpeas.opt_include}/libpeas-1.0
@@ -103,7 +109,7 @@ class Gedit < Formula
       -L#{gettext.opt_lib}
       -L#{glib.opt_lib}
       -L#{gobject_introspection.opt_lib}
-      -L#{gtksourceview3.opt_lib}
+      -L#{gtksourceview4.opt_lib}
       -L#{gtkx3.opt_lib}
       -L#{libpeas.opt_lib}
       -L#{lib}
@@ -113,14 +119,14 @@ class Gedit < Formula
       -lcairo-gobject
       -lgdk-3
       -lgdk_pixbuf-2.0
-      -lgedit
+      -lgedit-3.36
       -lgio-2.0
       -lgirepository-1.0
       -lglib-2.0
       -lgmodule-2.0
       -lgobject-2.0
       -lgtk-3
-      -lgtksourceview-3.0
+      -lgtksourceview-4.0
       -lintl
       -lpango-1.0
       -lpangocairo-1.0
@@ -131,3 +137,33 @@ class Gedit < Formula
     system "./test"
   end
 end
+
+__END__
+diff --git a/gedit/gedit-app-osx.m b/gedit/gedit-app-osx.m
+index 07774cc53..5df1b94da 100644
+--- a/gedit/gedit-app-osx.m
++++ b/gedit/gedit-app-osx.m
+@@ -32,6 +32,10 @@
+ #include "gedit-commands.h"
+ #include "gedit-commands-private.h"
+ #include "gedit-recent.h"
++#import <AppKit/AppKit.h>
++
++NSWindow *gdk_quartz_window_get_nswindow(GdkWindow *window);
++NSEvent *gdk_quartz_event_get_nsevent(GdkEvent *event);
+
+ static GeditWindow *
+ ensure_window (GeditAppOSX *app,
+diff --git a/gedit/gedit-file-chooser-dialog-osx.m b/gedit/gedit-file-chooser-dialog-osx.m
+index ecfbee62a..f897c81cd 100644
+--- a/gedit/gedit-file-chooser-dialog-osx.m
++++ b/gedit/gedit-file-chooser-dialog-osx.m
+@@ -29,6 +29,8 @@
+ #include "gedit-encodings-dialog.h"
+ #include "gedit-utils.h"
+
++NSWindow *gdk_quartz_window_get_nswindow(GdkWindow *window);
++
+ struct _GeditFileChooserDialogOSX
+ {
+	GObject parent_instance;

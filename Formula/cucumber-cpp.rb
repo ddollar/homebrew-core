@@ -1,38 +1,44 @@
 class CucumberCpp < Formula
   desc "Support for writing Cucumber step definitions in C++"
   homepage "https://cucumber.io"
-  url "https://github.com/cucumber/cucumber-cpp/archive/v0.4.tar.gz"
-  sha256 "57391dfade3639e5c219463cecae2ee066c620aa29fbb89e834a7067f9b8e0c8"
-  revision 4
+  url "https://github.com/cucumber/cucumber-cpp/archive/v0.5.tar.gz"
+  sha256 "9e1b5546187290b265e43f47f67d4ce7bf817ae86ee2bc5fb338115b533f8438"
+  revision 5
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "bd077e11bfdca0049b6a0cf328325a1862e682e3342f7dedb824def2cb145511" => :high_sierra
-    sha256 "dd3b90818b60c6842e150c3f324591d7e3135bad7a224a0ca810de1b2f367549" => :sierra
-    sha256 "1a2858aef5463172589ebab10d30b639581f455605749aed275096d769b2c8c3" => :el_capitan
+    sha256 "647928a1ca3316d5d7c46f1022b616f88c21fa9fab3ca147e8944a92377e2d67" => :catalina
+    sha256 "1913b19a2c3c876ae0ec6cf46bed0ea144cb97ab025b769472d9371c267e3764" => :mojave
+    sha256 "8d325d95cdd4a3dabcee3f9fe3184585dc5ddbae623033d157847a4ceca2bd45" => :high_sierra
   end
 
   depends_on "cmake" => :build
-
-  # Upstream issue from 19 Dec 2017 "Build fails with Boost 1.66.0"
-  # See https://github.com/cucumber/cucumber-cpp/issues/178
-  depends_on "boost@1.60"
+  depends_on "ruby" => :test if MacOS.version <= :sierra
+  depends_on "boost"
 
   def install
-    args = std_cmake_args
-    args << "-DCUKE_DISABLE_GTEST=on"
-    args << "-DCUKE_DISABLE_CPPSPEC=on"
-    args << "-DCUKE_DISABLE_FUNCTIONAL=on"
-    args << "-DCUKE_DISABLE_BOOST_TEST=on"
+    args = std_cmake_args + %w[
+      -DCUKE_DISABLE_GTEST=on
+      -DCUKE_DISABLE_CPPSPEC=on
+      -DCUKE_DISABLE_FUNCTIONAL=on
+      -DCUKE_DISABLE_BOOST_TEST=on
+    ]
+
     system "cmake", ".", *args
     system "cmake", "--build", "."
-    include.install "include/cucumber-cpp"
-    lib.install Dir["src/*.a"]
+    system "make", "install"
   end
 
   test do
     ENV["GEM_HOME"] = testpath
     ENV["BUNDLE_PATH"] = testpath
+    if MacOS.version >= :mojave && MacOS::CLT.installed?
+      ENV.delete("CPATH")
+      ENV["SDKROOT"] = MacOS::CLT.sdk_path(MacOS.version)
+    elsif MacOS.version == :high_sierra
+      ENV.delete("CPATH")
+      ENV.delete("SDKROOT")
+    end
     system "gem", "install", "cucumber", "-v", "3.0.0"
 
     (testpath/"features/test.feature").write <<~EOS
@@ -56,9 +62,9 @@ class CucumberCpp < Formula
       }
     EOS
     system ENV.cxx, "test.cpp", "-o", "test", "-I#{include}", "-L#{lib}",
-           "-lcucumber-cpp", "-I#{Formula["boost@1.60"].opt_include}",
-           "-L#{Formula["boost@1.60"].opt_lib}", "-lboost_regex", "-lboost_system",
-           "-lboost_program_options", "-lboost_filesystem"
+           "-lcucumber-cpp", "-I#{Formula["boost"].opt_include}",
+           "-L#{Formula["boost"].opt_lib}", "-lboost_regex", "-lboost_system",
+           "-lboost_program_options", "-lboost_filesystem", "-lboost_chrono"
     begin
       pid = fork { exec "./test" }
       expected = <<~EOS

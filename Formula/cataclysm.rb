@@ -1,54 +1,75 @@
 class Cataclysm < Formula
   desc "Fork/variant of Cataclysm Roguelike"
   homepage "https://github.com/CleverRaven/Cataclysm-DDA"
-  url "https://github.com/CleverRaven/Cataclysm-DDA/archive/0.C.tar.gz"
-  version "0.C"
-  sha256 "69e947824626fffb505ca4ec44187ec94bba32c1e5957ba5c771b3445f958af6"
-
+  url "https://github.com/CleverRaven/Cataclysm-DDA/archive/0.D.tar.gz"
+  version "0.D"
+  sha256 "6cc97b3e1e466b8585e8433a6d6010931e9a073f6ec060113161b38052d82882"
+  revision 1
   head "https://github.com/CleverRaven/Cataclysm-DDA.git"
 
   bottle do
     cellar :any
-    sha256 "6e602bda6632b19b42f907e952407b9669398604c7ee43aa19dbcca50166ab71" => :high_sierra
-    sha256 "1a821cdc40c5170e95c32877acdeb086fedecf366a505e27c559c557003b31de" => :sierra
-    sha256 "939d8b6b945457b91f77860f31675d9facf57a842e1b033ea4ed889ee91ab165" => :el_capitan
-    sha256 "e7ea748e9dd53bd0ace6c8456c4eb351616dc9c879621b6724ce742ae2b0d4f2" => :yosemite
+    rebuild 1
+    sha256 "e4709c4d9b01f108913de4c3cf8c3dafe0cdd490dbfa54f623755f98d6464bb3" => :catalina
+    sha256 "192f052d4474364cf61fdb920329dbd5ac1ca2a81f8f8d10be2dad22bd41d96b" => :mojave
+    sha256 "68a5e83bc0ff554b9b74d5062b93ad9a313c2e9e448ef1a02c1c2799eb8a9134" => :high_sierra
   end
 
-  option "with-tiles", "Enable tileset support"
-
-  needs :cxx11
-
+  depends_on "pkg-config" => :build
   depends_on "gettext"
-
-  if build.with? "tiles"
-    depends_on "sdl2"
-    depends_on "sdl2_image"
-    depends_on "sdl2_ttf"
-  end
+  depends_on "libogg"
+  depends_on "libvorbis"
+  depends_on "lua" unless build.head?
+  depends_on "sdl2"
+  depends_on "sdl2_image"
+  depends_on "sdl2_mixer"
+  depends_on "sdl2_ttf"
 
   def install
-    ENV.cxx11
-
     args = %W[
-      NATIVE=osx RELEASE=1 OSX_MIN=#{MacOS.version}
+      NATIVE=osx
+      RELEASE=1
+      OSX_MIN=#{MacOS.version}
+      USE_HOME_DIR=1
+      TILES=1
+      SOUND=1
+      RUNTESTS=0
+      ASTYLE=0
+      LINTJSON=0
     ]
 
-    args << "TILES=1" if build.with? "tiles"
     args << "CLANG=1" if ENV.compiler == :clang
+    args << "LUA=1" if build.stable?
 
     system "make", *args
 
     # no make install, so we have to do it ourselves
-    if build.with? "tiles"
-      libexec.install "cataclysm-tiles", "data", "gfx"
-    else
-      libexec.install "cataclysm", "data"
-    end
+    libexec.install "cataclysm-tiles", "data", "gfx"
+    libexec.install "lua" if build.stable?
 
     inreplace "cataclysm-launcher" do |s|
       s.change_make_var! "DIR", libexec
     end
     bin.install "cataclysm-launcher" => "cataclysm"
+  end
+
+  test do
+    # make user config directory
+    user_config_dir = testpath/"Library/Application Support/Cataclysm/"
+    user_config_dir.mkpath
+
+    # run cataclysm for 7 seconds
+    pid = fork do
+      exec bin/"cataclysm"
+    end
+    sleep 7
+    assert_predicate user_config_dir/"config",
+                     :exist?, "User config directory should exist"
+    assert_predicate user_config_dir/"templates",
+                     :exist?, "User template directory should exist"
+    assert_predicate user_config_dir/"save",
+                     :exist?, "User save directory should exist"
+  ensure
+    Process.kill("TERM", pid)
   end
 end

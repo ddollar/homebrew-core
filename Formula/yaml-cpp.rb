@@ -1,31 +1,22 @@
 class YamlCpp < Formula
   desc "C++ YAML parser and emitter for YAML 1.2 spec"
   homepage "https://github.com/jbeder/yaml-cpp"
-  url "https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.6.2.tar.gz"
-  sha256 "e4d8560e163c3d875fd5d9e5542b5fd5bec810febdcba61481fe5fc4e6b1fd05"
+  url "https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.6.3.tar.gz"
+  sha256 "77ea1b90b3718aa0c324207cb29418f5bced2354c2e483a9523d98c3460af1ed"
+  revision 1
 
   bottle do
     cellar :any
-    sha256 "5e1d0907d3cb39861ff36476f8cabb78d9bdf4a9b228cd860502b03b280c226d" => :high_sierra
-    sha256 "d081b409a0e7c60fc5c4d2c965b63fc0f0c7f3b1e36f61274719982ac5799b09" => :sierra
-    sha256 "5ad764dbd25373bc0bd68b213c611650694fe69f36c90fcd746aa90bc876e8f3" => :el_capitan
+    sha256 "7cb356c020e5e1f2a32d5b2721516b9079cc4518556a0344fd498df6abe04731" => :catalina
+    sha256 "ab76f2d444f7948c73f102588d079e4a3a0c758974f42cec1bffa31e80ca7bff" => :mojave
+    sha256 "824351b703802346eeb47a3a0acdbf438327cc1cb77ef4a342493a938574c6d6" => :high_sierra
   end
-
-  option "with-static-lib", "Build a static library"
 
   depends_on "cmake" => :build
 
-  needs :cxx11
-
   def install
-    args = std_cmake_args
-    if build.with? "static-lib"
-      args << "-DBUILD_SHARED_LIBS=OFF"
-    else
-      args << "-DBUILD_SHARED_LIBS=ON"
-    end
-
-    system "cmake", ".", *args
+    system "cmake", ".", *std_cmake_args, "-DYAML_BUILD_SHARED_LIBS=ON",
+                                          "-DYAML_CPP_BUILD_TESTS=OFF"
     system "make", "install"
   end
 

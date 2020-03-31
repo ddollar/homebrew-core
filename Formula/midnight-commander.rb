@@ -1,24 +1,28 @@
 class MidnightCommander < Formula
   desc "Terminal-based visual file manager"
   homepage "https://www.midnight-commander.org/"
-  url "https://www.midnight-commander.org/downloads/mc-4.8.20.tar.xz"
-  mirror "https://fossies.org/linux/misc/mc-4.8.20.tar.xz"
-  sha256 "017ee7f4f8ae420a04f4d6fcebaabe5b494661075c75442c76e9c8b1923d501c"
-  head "https://github.com/MidnightCommander/mc.git"
+  url "https://www.midnight-commander.org/downloads/mc-4.8.24.tar.xz"
+  sha256 "859f1cc070450bf6eb4d319ffcb6a5ac29deb0ac0d81559fb2e71242b1176d46"
 
   bottle do
-    sha256 "38c3c19eb05df22c810264ea103e7e60fd68650786bf901cf23783a827fe36c1" => :high_sierra
-    sha256 "9e1bbcf9abe4d17b332dad09be0f08539b94413e4030e02559c0505b4ae52076" => :sierra
-    sha256 "48f79c9e813f528ca32070a6462c15250007ffa4006e5cc104ecfce51f09b8ea" => :el_capitan
+    sha256 "c6adcb70e949c89ba12ba91fffb89ad00c55e8c3a063ae6d01954a02a84512f2" => :catalina
+    sha256 "2e3e95bd852f0edd7069b09ff24e897e94bb495f3b852230f7cc3400acfc2d9a" => :mojave
+    sha256 "2e888d8d8cec7a0c881d0df09f5662080494f89e1871fbcccf30e9a0cc18aa1b" => :high_sierra
   end
 
-  option "without-nls", "Build without Native Language Support"
+  head do
+    url "https://github.com/MidnightCommander/mc.git"
+
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
+  end
 
   depends_on "pkg-config" => :build
   depends_on "glib"
-  depends_on "openssl"
-  depends_on "s-lang"
   depends_on "libssh2"
+  depends_on "openssl@1.1"
+  depends_on "s-lang"
 
   conflicts_with "minio-mc", :because => "Both install a `mc` binary"
 
@@ -36,9 +40,7 @@ class MidnightCommander < Formula
     # Fix compilation bug on macOS 10.13 by pretending we don't have utimensat()
     # https://github.com/MidnightCommander/mc/pull/130
     ENV["ac_cv_func_utimensat"] = "no" if MacOS.version >= :high_sierra
-
-    args << "--disable-nls" if build.without? "nls"
-
+    system "./autogen.sh" if build.head?
     system "./configure", *args
     system "make", "install"
   end

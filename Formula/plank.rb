@@ -1,16 +1,16 @@
 class Plank < Formula
   desc "Framework for generating immutable model objects"
   homepage "https://pinterest.github.io/plank/"
-  url "https://github.com/pinterest/plank/archive/v1.4.1.tar.gz"
-  sha256 "021889470c1568364fb12e3c704ab98e74c5992749a244a1ef785dd870cad57b"
+  url "https://github.com/pinterest/plank/archive/v1.6.tar.gz"
+  sha256 "6a233120905ff371b5c06a23b3fc7dd67e96355dd4d992a58ac087db22c500ef"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "b5731e67f8155038764e927d6363c16f04cce69edc3c25bff78d9c39beaae4f9" => :high_sierra
-    sha256 "374262fdc60398fdf217c8bb2e458641ce683eb5dc6c5979cea84f0a5a4adc82" => :sierra
+    sha256 "fc6838079a8a975c9bb77d17a050aa722d8446fcf9f62ca9fe09c8822d8651b4" => :catalina
+    sha256 "04d2dddb094914fa219304fea8f6e5aa3315c2e51b63ef4077fcf25a54c8b268" => :mojave
   end
 
-  depends_on :xcode => ["9.0", :build]
+  depends_on :xcode => ["11.3", :build]
 
   def install
     system "make", "install", "PREFIX=#{prefix}"
@@ -22,7 +22,7 @@ class Plank < Formula
         "id": "pin.json",
         "title": "pin",
         "description" : "Schema definition of a Pin",
-        "$schema": "http://json-schema.org/schema#",
+        "$schema": "https://json-schema.org/schema#",
         "type": "object",
         "properties": {
           "id": { "type": "string" },

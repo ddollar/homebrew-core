@@ -1,30 +1,29 @@
 class Xmount < Formula
   desc "Convert between multiple input & output disk image types"
   homepage "https://www.pinguin.lu/xmount/"
-  url "https://code.pinguin.lu/diffusion/XMOUNT/xmount.git",
-      :tag => "v0.7.6",
-      :revision => "a417af7382c3e18fb8bd1341cc3307b09eefd578"
+  url "https://files.pinguin.lu/xmount-0.7.6.tar.gz"
+  sha256 "76e544cd55edc2dae32c42a38a04e11336f4985e1d59cec9dd41e9f9af9b0008"
+  revision 2
 
   bottle do
-    sha256 "88504e5b0c50741041083d475e74d3133556f72d5c07ac7ec5bc6425ea864422" => :high_sierra
-    sha256 "4b036597229de4f7a2c45a9107d86abbc26ba37a2c574c77df4a8b56258f9fec" => :sierra
-    sha256 "c86fd3b1b1f512190b38a3a937c23f496e365360c59c09943e0d0bbec2fe9504" => :el_capitan
+    rebuild 1
+    sha256 "55de429679b12e85dcfb854d4add045363a287c172b7b77765591d7d1d89324c" => :catalina
+    sha256 "ae937d5fdba6c278bef72a4f87d62a6dafc2f78ad642ee6995bc228743ed37cd" => :mojave
+    sha256 "a4436c7060d9b84abfa6450c7156cd994f42c130eebf1281e21319d6e5c00415" => :high_sierra
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
   depends_on "afflib"
   depends_on "libewf"
-  depends_on "openssl"
+  depends_on "openssl@1.1"
   depends_on :osxfuse
 
   def install
-    ENV.prepend_path "PKG_CONFIG_PATH", Formula["openssl"].opt_lib/"pkgconfig"
+    ENV.prepend_path "PKG_CONFIG_PATH", Formula["openssl@1.1"].opt_lib/"pkgconfig"
 
-    Dir.chdir "trunk" do
-      system "cmake", ".", *std_cmake_args
-      system "make", "install"
-    end
+    system "cmake", ".", *std_cmake_args
+    system "make", "install"
   end
 
   test do

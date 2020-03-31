@@ -1,8 +1,8 @@
 class AppEngineJava < Formula
   desc "Google App Engine for Java"
   homepage "https://cloud.google.com/appengine/docs/java/"
-  url "https://storage.googleapis.com/appengine-sdks/featured/appengine-java-sdk-1.9.63.zip"
-  sha256 "477eb0bdec2c98fa68e4d0d9cbd1329c140e907fa64be2c3c9c065373369e93b"
+  url "https://storage.googleapis.com/appengine-sdks/featured/appengine-java-sdk-1.9.72.zip"
+  sha256 "66af92c909c0403730aba7c4b9fbdc6d7ceb0f5310e7c2f1a653622dfa76c6fb"
 
   bottle :unneeded
 
@@ -21,10 +21,13 @@ class AppEngineJava < Formula
 
   test do
     (testpath/"WEB-INF/web.xml").write "<web-app/>"
-    (testpath/"WEB-INF/appengine-web.xml").write "<appengine-web-app><threadsafe>true</threadsafe></appengine-web-app>"
+    (testpath/"WEB-INF/appengine-web.xml").write \
+      "<appengine-web-app><threadsafe>true</threadsafe></appengine-web-app>"
     Process.setsid
     IO.popen("#{bin}/dev_appserver.sh . 2>&1") do |io|
-      assert_not_nil(io.gets, "Dev App Server terminated prematurely") until $LAST_READ_LINE == "INFO: Dev App Server is now running\n"
+      until $LAST_READ_LINE == "INFO: Dev App Server is now running\n"
+        assert_not_nil io.gets, "Dev App Server terminated prematurely"
+      end
       Signal.trap "INT", "IGNORE"
       Process.kill "INT", 0
     end

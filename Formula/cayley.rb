@@ -1,43 +1,43 @@
 class Cayley < Formula
   desc "Graph database inspired by Freebase and Knowledge Graph"
   homepage "https://github.com/cayleygraph/cayley"
-  url "https://github.com/cayleygraph/cayley/archive/v0.7.2.tar.gz"
-  sha256 "12be10ef129fef84392f2056a56a9f29ac8e1ecfb8facf1d5b5cff17a81e8e97"
-  head "https://github.com/google/cayley.git"
+  url "https://github.com/cayleygraph/cayley.git",
+    :tag      => "v0.7.7",
+    :revision => "dcf764fef381f19ee49fad186b4e00024709f148"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "da3ebc16ae88c74fe4d4fcf1e4721e009f93eb3f237f846585120936a251bd41" => :high_sierra
-    sha256 "f66d9137ad0bed1614ef52b3bf654fd9ccb55dd4479d45f9622d88f3ec1e34b5" => :sierra
-    sha256 "2404473b2973f8d47fb40a0eac16998d1e27b1036901261f47f07a7cbccdc713" => :el_capitan
+    sha256 "e647be34623b1a8d635df7508f09111dfd8eb6f368a6979f9c5619b016beda8c" => :mojave
+    sha256 "4177fdcb60422d484f1377e5367844ebcc9be471fffc76e717d8ad90e49ee99c" => :high_sierra
   end
 
-  option "without-samples", "Don't install sample data"
-
   depends_on "bazaar" => :build
-  depends_on "mercurial" => :build
-  depends_on "glide" => :build
   depends_on "go" => :build
+  depends_on "mercurial" => :build
 
   def install
     ENV["GOPATH"] = buildpath
-    ENV["GLIDE_HOME"] = HOMEBREW_CACHE/"glide_home/#{name}"
 
-    (buildpath/"src/github.com/cayleygraph/cayley").install buildpath.children
-    cd "src/github.com/cayleygraph/cayley" do
-      system "glide", "install"
-      system "go", "build", "-o", bin/"cayley", "-ldflags",
-             "-X main.Version=#{version}", ".../cmd/cayley"
+    dir = buildpath/"src/github.com/cayleygraph/cayley"
+    dir.install buildpath.children
+
+    cd dir do
+      commit = Utils.popen_read("git rev-parse --short HEAD").chomp
+
+      ldflags = %W[
+        -s -w
+        -X github.com/cayleygraph/cayley/version.Version=#{version}
+        -X github.com/cayleygraph/cayley/version.GitHash=#{commit}
+      ]
+
+      system "go", "build", "-o", bin/"cayley", "-ldflags", ldflags.join(" "), ".../cmd/cayley"
 
       inreplace "cayley_example.yml", "./cayley.db", var/"cayley/cayley.db"
       etc.install "cayley_example.yml" => "cayley.yml"
 
-      (pkgshare/"assets").install "docs", "static", "templates"
-
-      if build.with? "samples"
-        system "gzip", "-d", "data/30kmoviedata.nq.gz"
-        (pkgshare/"samples").install "data/testdata.nq", "data/30kmoviedata.nq"
-      end
+      # Install samples
+      system "gzip", "-d", "data/30kmoviedata.nq.gz"
+      (pkgshare/"samples").install "data/testdata.nq", "data/30kmoviedata.nq"
     end
   end
 
@@ -50,37 +50,37 @@ class Cayley < Formula
     end
   end
 
-  plist_options :manual => "cayley http --assets=#{HOMEBREW_PREFIX}/share/cayley/assets --config=#{HOMEBREW_PREFIX}/etc/cayley.conf"
+  plist_options :manual => "cayley http --config=#{HOMEBREW_PREFIX}/etc/cayley.conf"
 
-  def plist; <<~EOS
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
+  def plist
+    <<~EOS
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
         <dict>
-          <key>SuccessfulExit</key>
-          <false/>
+          <key>KeepAlive</key>
+          <dict>
+            <key>SuccessfulExit</key>
+            <false/>
+          </dict>
+          <key>Label</key>
+          <string>#{plist_name}</string>
+          <key>ProgramArguments</key>
+          <array>
+            <string>#{opt_bin}/cayley</string>
+            <string>http</string>
+            <string>--config=#{etc}/cayley.conf</string>
+          </array>
+          <key>RunAtLoad</key>
+          <true/>
+          <key>WorkingDirectory</key>
+          <string>#{var}/cayley</string>
+          <key>StandardErrorPath</key>
+          <string>#{var}/log/cayley.log</string>
+          <key>StandardOutPath</key>
+          <string>#{var}/log/cayley.log</string>
         </dict>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_bin}/cayley</string>
-          <string>http</string>
-          <string>--assets=#{opt_pkgshare}/assets</string>
-          <string>--config=#{etc}/cayley.conf</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>WorkingDirectory</key>
-        <string>#{var}/cayley</string>
-        <key>StandardErrorPath</key>
-        <string>#{var}/log/cayley.log</string>
-        <key>StandardOutPath</key>
-        <string>#{var}/log/cayley.log</string>
-      </dict>
-    </plist>
+      </plist>
     EOS
   end
 

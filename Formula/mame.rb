@@ -1,53 +1,61 @@
 class Mame < Formula
   desc "Multiple Arcade Machine Emulator"
-  homepage "http://mamedev.org/"
-  url "https://github.com/mamedev/mame/archive/mame0196.tar.gz"
-  version "0.196"
-  sha256 "fc4436a23d7f2ef0b3c3f600c00745bc468541d0d29bcd3a1e0c599c5c02df7f"
+  homepage "https://mamedev.org/"
+  url "https://github.com/mamedev/mame/archive/mame0219.tar.gz"
+  version "0.219"
+  sha256 "9513c046033e451d86adfdd297da8a2ad9b6642a2f3ef669e1443d0acc2c2e0b"
   head "https://github.com/mamedev/mame.git"
 
   bottle do
     cellar :any
-    sha256 "299cbf496f5aa2678559e8a724c41821905ad31334d6644c1ee064077f8aca37" => :high_sierra
-    sha256 "a58d9f8aefd2f17181eec23f32dcd12ca900e95c5522d1dfc246fb62620c4032" => :sierra
-    sha256 "923a484f1676a8a633516aea340141880917a85bd498124a4d1d04cdeee7f046" => :el_capitan
+    sha256 "d7117f326fd3b009a92ed2ee11f35ffe8eb076f2f121106756b090fc1bdd93ad" => :catalina
+    sha256 "baae3e489fb6025d9d984d1746a76e1e79615e522d6adbb57bc2787a02b15ff8" => :mojave
+    sha256 "a02f22733af9275e3c4d1b83dda0fc14a0b1543fc78be646933aa3260c0c44b6" => :high_sierra
   end
 
-  depends_on :macos => :yosemite
+  depends_on "glm" => :build
   depends_on "pkg-config" => :build
+  depends_on "pugixml" => :build
+  depends_on "rapidjson" => :build
   depends_on "sphinx-doc" => :build
-  depends_on "sdl2"
-  depends_on "jpeg"
   depends_on "flac"
+  depends_on "jpeg"
   depends_on "lua"
-  depends_on "sqlite"
-  depends_on "portmidi"
-  depends_on "portaudio"
-  depends_on "utf8proc"
-
   # Need C++ compiler and standard library support C++14.
-  needs :cxx14
-
-  # jpeg 9 compatibility
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/2b7053a/mame/jpeg9.patch"
-    sha256 "be8095e1b519f17ac4b9e6208f2d434e47346d8b4a8faf001b68749aac3efd20"
-  end
+  # Build failure on Sierra, see:
+  # https://github.com/Homebrew/homebrew-core/pull/39388
+  depends_on :macos => :high_sierra
+  depends_on "portaudio"
+  depends_on "portmidi"
+  depends_on "sdl2"
+  depends_on "sqlite"
+  depends_on "utf8proc"
 
   def install
     inreplace "scripts/src/osd/sdl.lua", "--static", ""
+
+    # Mame's build system genie can't find headers and libraries with version suffix.
+    ENV.append "CPPFLAGS", "-I#{Formula["lua"].opt_include}/lua"
+    ENV.append "CPPFLAGS", "-I#{Formula["pugixml"].opt_include}/pugixml-1.9"
+    ENV.append "LDFLAGS", "-L#{Formula["pugixml"].opt_lib}/pugixml-1.9"
+
     system "make", "USE_LIBSDL=1",
                    "USE_SYSTEM_LIB_EXPAT=1",
                    "USE_SYSTEM_LIB_ZLIB=1",
-                   "USE_SYSTEM_LIB_JPEG=1",
                    "USE_SYSTEM_LIB_FLAC=1",
+                   "USE_SYSTEM_LIB_GLM=1",
+                   "USE_SYSTEM_LIB_JPEG=1",
                    "USE_SYSTEM_LIB_LUA=1",
-                   "USE_SYSTEM_LIB_SQLITE3=1",
                    "USE_SYSTEM_LIB_PORTMIDI=1",
                    "USE_SYSTEM_LIB_PORTAUDIO=1",
+                   "USE_SYSTEM_LIB_PUGIXML=1",
+                   "USE_SYSTEM_LIB_RAPIDJSON=1",
+                   "USE_SYSTEM_LIB_SQLITE3=1",
                    "USE_SYSTEM_LIB_UTF8PROC=1"
     bin.install "mame64" => "mame"
     cd "docs" do
+      # We don't convert SVG files into PDF files, don't load the related extensions.
+      inreplace "source/conf.py", "'sphinxcontrib.rsvgconverter'", ""
       system "make", "text"
       doc.install Dir["build/text/*"]
       system "make", "man"

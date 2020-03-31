@@ -1,66 +1,55 @@
 class Pyqt < Formula
   desc "Python bindings for v5 of Qt"
   homepage "https://www.riverbankcomputing.com/software/pyqt/download5"
-  url "https://dl.bintray.com/homebrew/mirror/pyqt-5.10.1.tar.gz"
-  mirror "https://downloads.sourceforge.net/project/pyqt/PyQt5/PyQt-5.10.1/PyQt5_gpl-5.10.1.tar.gz"
-  sha256 "9932e971e825ece4ea08f84ad95017837fa8f3f29c6b0496985fa1093661e9ef"
+  url "https://files.pythonhosted.org/packages/7c/5b/e760ec4f868cb77cee45b4554bf15d3fe6972176e89c4e3faac941213694/PyQt5-5.14.0.tar.gz"
+  sha256 "0145a6b7de15756366decb736c349a0cb510d706c83fda5b8cd9e0557bc1da72"
 
   bottle do
-    sha256 "cd346b8e55439c8492c3d62547663afe68ffe722eae98f79bc7dbc01af9b088c" => :high_sierra
-    sha256 "133864e1f65eac84555cfb21bc7108bc92c0e7d375f5094ad2d8d30080c8f388" => :sierra
-    sha256 "7befa5819255a5048171f493fbcb4fa62e19cd2f2d97b5e10388dcd4151eb069" => :el_capitan
+    cellar :any
+    sha256 "e2abbfd19a3b2e9c52f2c1c4fb84cc752f832b616a89c1138ab74cad96d95584" => :catalina
+    sha256 "5026dd96d99bb8866d2a2b3bf1bc55d66f9ddbd39e9180ee7c921481b49f39b9" => :mojave
+    sha256 "32f1de6e98558bbf79e31771cfa6bce4206bac12108f384324006c1a18209dfc" => :high_sierra
   end
 
-  option "with-debug", "Build with debug symbols"
-  option "with-docs", "Install HTML documentation and python examples"
-
-  deprecated_option "enable-debug" => "with-debug"
-
+  depends_on "python"
   depends_on "qt"
   depends_on "sip"
-  depends_on "python" => :recommended
-  depends_on "python@2" => :recommended
 
   def install
-    Language::Python.each_python(build) do |python, version|
-      args = ["--confirm-license",
-              "--bindir=#{bin}",
-              "--destdir=#{lib}/python#{version}/site-packages",
-              "--stubsdir=#{lib}/python#{version}/site-packages/PyQt5",
-              "--sipdir=#{share}/sip/Qt5",
-              # sip.h could not be found automatically
-              "--sip-incdir=#{Formula["sip"].opt_include}",
-              "--qmake=#{Formula["qt"].bin}/qmake",
-              # Force deployment target to avoid libc++ issues
-              "QMAKE_MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}",
-              "--qml-plugindir=#{pkgshare}/plugins",
-              "--verbose"]
-      args << "--debug" if build.with? "debug"
+    version = Language::Python.major_minor_version "python3"
+    args = ["--confirm-license",
+            "--bindir=#{bin}",
+            "--destdir=#{lib}/python#{version}/site-packages",
+            "--stubsdir=#{lib}/python#{version}/site-packages/PyQt5",
+            "--sipdir=#{share}/sip/Qt5",
+            # sip.h could not be found automatically
+            "--sip-incdir=#{Formula["sip"].opt_include}",
+            "--qmake=#{Formula["qt"].bin}/qmake",
+            # Force deployment target to avoid libc++ issues
+            "QMAKE_MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}",
+            "--designer-plugindir=#{pkgshare}/plugins",
+            "--qml-plugindir=#{pkgshare}/plugins",
+            "--verbose"]
 
-      system python, "configure.py", *args
-      system "make"
-      system "make", "install"
-      system "make", "clean"
-    end
-    doc.install "doc/html", "examples" if build.with? "docs"
+    system "python3", "configure.py", *args
+    system "make"
+    ENV.deparallelize { system "make", "install" }
   end
 
   test do
     system "#{bin}/pyuic5", "--version"
     system "#{bin}/pylupdate5", "-version"
-    Language::Python.each_python(build) do |python, _version|
-      system python, "-c", "import PyQt5"
-      %w[
-        Gui
-        Location
-        Multimedia
-        Network
-        Quick
-        Svg
-        WebEngineWidgets
-        Widgets
-        Xml
-      ].each { |mod| system python, "-c", "import PyQt5.Qt#{mod}" }
-    end
+
+    system "python3", "-c", "import PyQt5"
+    %w[
+      Gui
+      Location
+      Multimedia
+      Network
+      Quick
+      Svg
+      Widgets
+      Xml
+    ].each { |mod| system "python3", "-c", "import PyQt5.Qt#{mod}" }
   end
 end

@@ -1,14 +1,14 @@
 class Clblast < Formula
   desc "Tuned OpenCL BLAS library"
   homepage "https://github.com/CNugteren/CLBlast"
-  url "https://github.com/CNugteren/CLBlast/archive/1.3.0.tar.gz"
-  sha256 "fd5e06c261551366b46ccbc7841012cc69b58c74ed641db4f7a157c055d24223"
+  url "https://github.com/CNugteren/CLBlast/archive/1.5.1.tar.gz"
+  sha256 "1679843290efdeafdc187c07dc033e27067b37e34243f9417087700f61408069"
 
   bottle do
     cellar :any
-    sha256 "8254e3e21d6633170743bf46b035a00df6139ce0181ca58613fbea88b44dd1e6" => :high_sierra
-    sha256 "a80742b7dceee1d82f82b038138bf0a66844b11e67861405faa4999140f689d7" => :sierra
-    sha256 "6f1ceb76dd369fb8129c8ec252b2c8a54c95572e6e3d02d8df758296ba47e062" => :el_capitan
+    sha256 "e1908450ec5ca862fc49fd80a2c33565729187372749e395a88baa49371465e5" => :catalina
+    sha256 "b6b81483ab6621bb1a9002e771c50d8fa90364b39aabe293dc276991ab5e60b5" => :mojave
+    sha256 "d4fc7ec77ca33d0d8182e345000044a925128ffdbc39f7e0802c8500475007c8" => :high_sierra
   end
 
   depends_on "cmake" => :build

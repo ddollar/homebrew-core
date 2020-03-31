@@ -1,26 +1,33 @@
 class Fail2ban < Formula
   desc "Scan log files and ban IPs showing malicious signs"
   homepage "https://www.fail2ban.org/"
-  url "https://github.com/fail2ban/fail2ban/archive/0.10.2.tar.gz"
-  sha256 "1c1a969137c56f7e8b90e5f14d78b80214d34d67209787bfddc8d5804ceb29cc"
+  url "https://github.com/fail2ban/fail2ban/archive/0.11.1.tar.gz"
+  sha256 "71d2a52b66bb0f87ac3812246bdd3819ec561913cd44afd39130a342f043aa6d"
 
   bottle do
-    sha256 "7df5e20adee94e05e17d2c0075cf96dc737dff1322840ee285002b10b1a0d412" => :high_sierra
-    sha256 "458009f5e2af3925a076cfaa79c19497515e6133a467fc03ee54ef6f30588b47" => :sierra
-    sha256 "5d371a874cea2e19f5af3f8a0e2533cc740e6fb847bc9c533af52b12ecff582d" => :el_capitan
+    cellar :any_skip_relocation
+    sha256 "74818c094f3afe181c5f6870331822d4bb32d99258f31f2dc30cfea89d111051" => :catalina
+    sha256 "01c86b6a7c231710a39884494ab6cca4f1568724bcb3abc3edade9c56207d236" => :mojave
+    sha256 "336d82f86f30d90847910f8ba414b6326104f1109fe7fad3fab1af3d62331be4" => :high_sierra
   end
 
   depends_on "help2man" => :build
   depends_on "sphinx-doc" => :build
+  depends_on "python@3.8"
 
   def install
-    ENV.prepend_create_path "PYTHONPATH", libexec/"lib/python2.7/site-packages"
+    ENV.prepend_create_path "PYTHONPATH", libexec/"lib/python3.8/site-packages"
+    ENV["PYTHON"] = Formula["python@3.8"].opt_bin/"python3"
 
     rm "setup.cfg"
     Dir["config/paths-*.conf"].each do |r|
-      next if File.basename(r) =~ /paths-common\.conf|paths-osx\.conf/
+      next if /paths-common\.conf|paths-osx\.conf/.match?(File.basename(r))
+
       rm r
     end
+
+    # Replace paths in config
+    inreplace "config/jail.conf", "before = paths-debian.conf", "before = paths-osx.conf"
 
     # Replace hardcoded paths
     inreplace "setup.py" do |s|
@@ -61,7 +68,7 @@ class Fail2ban < Formula
     inreplace "setup.py", "if os.path.exists('#{var}/run')", "if True"
     inreplace "setup.py", "platform_system in ('linux',", "platform_system in ('linux', 'darwin',"
 
-    system "python", "setup.py", "install", "--prefix=#{libexec}"
+    system "python3", "setup.py", "install", "--prefix=#{libexec}"
 
     cd "doc" do
       system "make", "dirhtml", "SPHINXBUILD=sphinx-build"

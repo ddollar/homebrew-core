@@ -1,14 +1,15 @@
 class Libdill < Formula
   desc "Structured concurrency in C"
   homepage "http://libdill.org/"
-  url "https://github.com/sustrik/libdill/archive/2.7.tar.gz"
-  sha256 "b78353308cbbcd442f9c3feab86afeac1bf79eb27186bad9f75efc07c4bfedbf"
+  url "https://github.com/sustrik/libdill/archive/2.14.tar.gz"
+  sha256 "ebba0e5b433ec123b74a57d49b89dfa673aa258e03e6a452959e556b4c4529b9"
 
   bottle do
     cellar :any
-    sha256 "5a9a878697a380071c895103066f64dec1640866b8a42be3686e86f81ba93425" => :high_sierra
-    sha256 "2d77d4d8a79e7d33907753178241927862711feaa049f41e0c84166b150df9e7" => :sierra
-    sha256 "363996d19ca44f90e7a088195a21628dbd8e1a7fe78b87d2edbb3f7dfebcdb0c" => :el_capitan
+    sha256 "124f2fd7aa4ba68e528bd2700637511943ae55ec9c2b2c9dcdb3bff1f2e34909" => :catalina
+    sha256 "7ebbbe85ab5989b48664688c9fdc833b4bbc7846ea94f3f73c34ef620026b878" => :mojave
+    sha256 "062d2f9f6fdeb5588036d3e06752ecfd95b5f4e7b6008b727208fc0a2e7f50a6" => :high_sierra
+    sha256 "6f75a82c15eafe6818b0d79e9c55df0654c6665f37841ee21cf7fb90ac578a92" => :sierra
   end
 
   depends_on "autoconf" => :build

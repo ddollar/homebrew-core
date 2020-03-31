@@ -1,15 +1,16 @@
 class Aptly < Formula
   desc "Swiss army knife for Debian repository management"
   homepage "https://www.aptly.info/"
-  url "https://github.com/smira/aptly/archive/v1.2.0.tar.gz"
-  sha256 "e41ee52ba530b65ff5ec8b1ef3ee9c61882d1c44857d343b9a760e8a8e4230d7"
-  head "https://github.com/smira/aptly.git"
+  url "https://github.com/aptly-dev/aptly/archive/v1.4.0.tar.gz"
+  sha256 "4172d54613139f6c34d5a17396adc9675d7ed002e517db8381731d105351fbe5"
+  revision 1
+  head "https://github.com/aptly-dev/aptly.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "bc6eac38589d708fc99ec4dbe6d4b0f22765ed893f7f2ab19ccee50306d870f0" => :high_sierra
-    sha256 "fdc4509d1f83c16c4d4b1eec87e6cfe5bc517eec3a67ad515244eeb9eb994d3e" => :sierra
-    sha256 "5fbb7c41aeea6dbcc1c91e3bc1cf9c156e4d8820a828b8c935e07a9b3d3df942" => :el_capitan
+    sha256 "d14f3a2e0589a69b545078f4408a7ff804f727769f9ac0f66b0e08cbed96a7de" => :catalina
+    sha256 "4a164a193db58e11d6e7b18f7e911a8d7a96e8b40201160b822d8ade95181f65" => :mojave
+    sha256 "53301cc0bf47b4eeadf784856ee71bc72c9be5db62ad0462ded0f843aed49b42" => :high_sierra
   end
 
   depends_on "go" => :build
@@ -17,10 +18,12 @@ class Aptly < Formula
   def install
     ENV["GOPATH"] = buildpath
     ENV["GOBIN"] = bin
-    (buildpath/"src/github.com/smira/aptly").install buildpath.children
-    cd "src/github.com/smira/aptly" do
+    (buildpath/"src/github.com/aptly-dev/aptly").install buildpath.children
+    cd "src/github.com/aptly-dev/aptly" do
       system "make", "VERSION=#{version}", "install"
       prefix.install_metafiles
+      bash_completion.install "completion.d/aptly"
+      zsh_completion.install "completion.d/_aptly"
     end
   end
 

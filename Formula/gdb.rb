@@ -1,27 +1,25 @@
 class Gdb < Formula
   desc "GNU debugger"
   homepage "https://www.gnu.org/software/gdb/"
-  url "https://ftp.gnu.org/gnu/gdb/gdb-8.1.tar.xz"
-  mirror "https://ftpmirror.gnu.org/gdb/gdb-8.1.tar.xz"
-  sha256 "af61a0263858e69c5dce51eab26662ff3d2ad9aa68da9583e8143b5426be4b34"
+  url "https://ftp.gnu.org/gnu/gdb/gdb-9.1.tar.xz"
+  mirror "https://ftpmirror.gnu.org/gdb/gdb-9.1.tar.xz"
+  sha256 "699e0ec832fdd2f21c8266171ea5bf44024bd05164fdf064e4d10cc4cf0d1737"
+  revision 1
+  head "https://sourceware.org/git/binutils-gdb.git"
 
   bottle do
-    sha256 "43a6d6cca157ef70d13848f35c04e11d832dc0c96f5bcf53a43330f524b3ac40" => :high_sierra
-    sha256 "fe7c6261f9164e7a744c9c512ba7e5afff0e74e373ece9b5aa19d5da6443bfc2" => :sierra
-    sha256 "cd89001bcf8c93b5d6425ab91a400aeffe0cd5bbb0eccd8ab38c719ab5ca34ba" => :el_capitan
+    sha256 "848a06573870a26ca89fe859fe8d2e159b1781db544841a55c0713f00b7c18bc" => :catalina
+    sha256 "24640c71e5cdbb1ccd69e5da454267e3929e0b1d73abf91c162c4658f756d755" => :mojave
+    sha256 "d279ccc0f8eefc8a7b3ac5f182290af201345adf4523b3a2671ab752e821d186" => :high_sierra
   end
 
-  deprecated_option "with-brewed-python" => "with-python@2"
-  deprecated_option "with-guile" => "with-guile@2.0"
-  deprecated_option "with-python" => "with-python@2"
+  depends_on "python@3.8"
+  depends_on "xz" # required for lzma support
 
-  option "with-python", "Use the Homebrew version of Python; by default system Python is used"
-  option "with-version-suffix", "Add a version suffix to program"
-  option "with-all-targets", "Build with support for all targets"
+  uses_from_macos "expat"
+  uses_from_macos "ncurses"
 
-  depends_on "pkg-config" => :build
-  depends_on "python@2" => :optional
-  depends_on "guile@2.0" => :optional
+  conflicts_with "i386-elf-gdb", :because => "both install include/gdb, share/gdb and share/info"
 
   fails_with :clang do
     build 800
@@ -31,52 +29,36 @@ class Gdb < Formula
     EOS
   end
 
-  fails_with :clang do
-    build 600
-    cause <<~EOS
-      clang: error: unable to execute command: Segmentation fault: 11
-      Test done on: Apple LLVM version 6.0 (clang-600.0.56) (based on LLVM 3.5svn)
-    EOS
-  end
-
   def install
-    args = [
-      "--prefix=#{prefix}",
-      "--disable-debug",
-      "--disable-dependency-tracking",
+    args = %W[
+      --enable-targets=all
+      --prefix=#{prefix}
+      --disable-debug
+      --disable-dependency-tracking
+      --with-lzma
+      --with-python=#{Formula["python@3.8"].opt_bin}/python3
+      --disable-binutils
     ]
 
-    args << "--with-guile" if build.with? "guile@2.0"
-    args << "--enable-targets=all" if build.with? "all-targets"
+    mkdir "build" do
+      system "../configure", *args
+      system "make"
 
-    if build.with? "python@2"
-      args << "--with-python=#{Formula["python"].opt_libexec}/bin"
-    else
-      args << "--with-python=/usr"
+      # Don't install bfd or opcodes, as they are provided by binutils
+      system "make", "install-gdb"
     end
-
-    if build.with? "version-suffix"
-      args << "--program-suffix=-#{version.to_s.slice(/^\d/)}"
-    end
-
-    system "./configure", *args
-    system "make"
-
-    # Don't install bfd or opcodes, as they are provided by binutils
-    inreplace ["bfd/Makefile", "opcodes/Makefile"], /^install:/, "dontinstall:"
-
-    system "make", "install"
   end
 
-  def caveats; <<~EOS
-    gdb requires special privileges to access Mach ports.
-    You will need to codesign the binary. For instructions, see:
+  def caveats
+    <<~EOS
+      gdb requires special privileges to access Mach ports.
+      You will need to codesign the binary. For instructions, see:
 
-      https://sourceware.org/gdb/wiki/BuildingOnDarwin
+        https://sourceware.org/gdb/wiki/BuildingOnDarwin
 
-    On 10.12 (Sierra) or later with SIP, you need to run this:
+      On 10.12 (Sierra) or later with SIP, you need to run this:
 
-      echo "set startup-with-shell off" >> ~/.gdbinit
+        echo "set startup-with-shell off" >> ~/.gdbinit
     EOS
   end
 

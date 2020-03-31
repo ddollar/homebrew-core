@@ -1,46 +1,25 @@
 class JpegTurbo < Formula
   desc "JPEG image codec that aids compression and decompression"
   homepage "https://www.libjpeg-turbo.org/"
-  url "https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.3/libjpeg-turbo-1.5.3.tar.gz"
-  sha256 "b24890e2bb46e12e72a79f7e965f409f4e16466d00e1dd15d93d73ee6b592523"
+  url "https://downloads.sourceforge.net/project/libjpeg-turbo/2.0.4/libjpeg-turbo-2.0.4.tar.gz"
+  sha256 "33dd8547efd5543639e890efbf2ef52d5a21df81faf41bb940657af916a23406"
+  head "https://github.com/libjpeg-turbo/libjpeg-turbo.git"
 
   bottle do
-    cellar :any
-    sha256 "f40b0fe6a775f787436bace3e201c0cd9b441fe24c64093c948ddc369e94b0fd" => :high_sierra
-    sha256 "0a499d6cc6e1de389154fb0d859fe2def77a973c629125ac8c783cb872e055db" => :sierra
-    sha256 "6912770fdaefa0941c3259cbec3abf670ba8b6067239fde276686ed610599dda" => :el_capitan
-  end
-
-  devel do
-    url "https://github.com/libjpeg-turbo/libjpeg-turbo/archive/1.5.90.tar.gz"
-    sha256 "cb948ade92561d8626fd7866a4a7ba3b952f9759ea3dd642927bc687470f60b7"
-
-    depends_on "cmake" => :build
-  end
-
-  head do
-    url "https://github.com/libjpeg-turbo/libjpeg-turbo.git"
-
-    depends_on "cmake" => :build
+    sha256 "9e99da7951aacca885be09047b17504931d714e980c0f6c6c80e1255feb83f4a" => :catalina
+    sha256 "0a069b4a7a45f49f35ec4e2d0f0a4745df6d20cbdbc5f30d68cec32d32702bb0" => :mojave
+    sha256 "1a702773d1cfcc71ef75f80b1b14e0b4903da65e462a5e52361c2a2988f05764" => :high_sierra
   end
 
   keg_only "libjpeg-turbo is not linked to prevent conflicts with the standard libjpeg"
 
-  option "without-test", "Skip build-time checks (Not Recommended)"
-
+  depends_on "cmake" => :build
   depends_on "nasm" => :build
 
   def install
-    if build.stable?
-      system "./configure", "--disable-dependency-tracking",
-                            "--prefix=#{prefix}",
-                            "--with-jpeg8"
-    else
-      system "cmake", ".", "-DWITH_JPEG8=1", *std_cmake_args
-    end
-
+    system "cmake", ".", "-DWITH_JPEG8=1", *std_cmake_args
     system "make"
-    system "make", "test" if build.with? "test"
+    system "make", "test"
     system "make", "install"
   end
 

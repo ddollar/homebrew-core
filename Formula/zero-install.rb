@@ -1,42 +1,56 @@
 class ZeroInstall < Formula
   desc "Zero Install is a decentralised software installation system"
-  homepage "http://0install.net/"
-  url "https://github.com/0install/0install/archive/v2.12-1.tar.gz"
-  version "2.12-1"
-  sha256 "317ac6ac680d021cb475962b7f6c2bcee9c35ce7cf04ae00d72bba8113f13559"
-  revision 2
+  homepage "https://0install.net/"
+  url "https://github.com/0install/0install.git",
+      :tag      => "v2.15.1",
+      :revision => "e67df8585bbe75654a1d5aec60d8e46a4688b5e6"
+  head "https://github.com/0install/0install.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "5a736e35a617a5c234f7d8ba42a20c4add1af4243a03a44c69555fe4047ce6ae" => :high_sierra
-    sha256 "e1f05fd470aba09720acfa93b2b32523d9124816d28adc09bd890464c1f4062f" => :sierra
-    sha256 "9296e314e4d685afa1df4306f086af9fe6de208889f6d6014261207ea55899c2" => :el_capitan
+    sha256 "670a096307222ef611ea885ac9c1389ffe34c69a220def618e22f14941113737" => :catalina
+    sha256 "a77fcd995618cefc919fd89e38b644be27618c89120f2296555be21674776ec4" => :mojave
+    sha256 "a699dbf8f06b7f392c8dd5cb28c8e24ed6ca6f7aff51226d3abf72afdcc53e53" => :high_sierra
   end
 
-  depends_on "pkg-config" => :build
   depends_on "ocaml" => :build
   depends_on "ocamlbuild" => :build
   depends_on "opam" => :build
-  depends_on "camlp4" => :build
+  depends_on "pkg-config" => :build
   depends_on "gnupg"
-  depends_on "gtk+" => :optional
 
   def install
-    ENV["OCAMLPARAM"] = "safe-string=0,_" # OCaml 4.06.0 compat
     ENV.append_path "PATH", Formula["gnupg"].opt_bin
 
-    opamroot = buildpath/"opamroot"
-    ENV["OPAMROOT"] = opamroot
-    ENV["OPAMYES"] = "1"
-    system "opam", "init", "--no-setup"
-    modules = %w[yojson xmlm ounit react ppx_tools lwt<3 extlib ocurl sha]
-    modules << "lablgtk" if build.with? "gtk+"
-    system "opam", "config", "exec", "opam", "install", *modules
+    # Use correct curl headers
+    ENV["HOMEBREW_SDKROOT"] = MacOS::CLT.sdk_path(MacOS.version) if MacOS.version >= :mojave && MacOS::CLT.installed?
 
-    system "opam", "config", "exec", "make"
-    inreplace "dist/install.sh", '"/usr/local"', prefix
-    inreplace "dist/install.sh", '"${PREFIX}/man"', man
-    system "make", "install"
+    Dir.mktmpdir("opamroot") do |opamroot|
+      ENV["OPAMROOT"] = opamroot
+      ENV["OPAMYES"] = "1"
+      ENV["OPAMVERBOSE"] = "1"
+      system "opam", "init", "--no-setup", "--disable-sandboxing"
+      modules = %w[
+        yojson
+        xmlm
+        ounit
+        lwt_react
+        ocurl
+        sha
+        dune
+      ]
+      system "opam", "config", "exec", "opam", "install", *modules
+
+      # mkdir: <buildpath>/build: File exists.
+      # https://github.com/0install/0install/issues/87
+      ENV.deparallelize { system "opam", "config", "exec", "make" }
+
+      inreplace "dist/install.sh" do |s|
+        s.gsub! '"/usr/local"', prefix
+        s.gsub! '"${PREFIX}/man"', man
+      end
+      system "make", "install"
+    end
   end
 
   test do

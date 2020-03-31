@@ -1,21 +1,20 @@
 class Wavpack < Formula
   desc "Hybrid lossless audio compression"
   homepage "http://www.wavpack.com/"
-  url "http://www.wavpack.com/wavpack-5.1.0.tar.bz2"
-  sha256 "1939627d5358d1da62bc6158d63f7ed12905552f3a799c799ee90296a7612944"
+  url "http://www.wavpack.com/wavpack-5.2.0.tar.bz2"
+  sha256 "3c238cc4362523ac2432652af15861796fe7de9ae08f1ef7f3c690bad7494e18"
 
   bottle do
     cellar :any
-    sha256 "3c474a8b2b524f596888089a374aa733c09615e4a861a11b7317204ef42c8c25" => :high_sierra
-    sha256 "caaf7a9f778270e2f445c4a4f864afbdbc5c410531866c06a5bfe9d0b10dbc36" => :sierra
-    sha256 "5ad0e936fa7f53926838964c434e34c303bb540f676fb42b03d37845ace86940" => :el_capitan
-    sha256 "14d36c9f2f704d8d1181f63ad965690a4594444394ce42d2cfaf63cbfc981051" => :yosemite
+    sha256 "ff3ac4375bca41b6a6a683cfe3ca24e36d50682c64dfb1a6cb75841fbac49613" => :catalina
+    sha256 "6c1a4ebbd4173c86d2256366be6b09bf7306e9f063d396e02c5230a73312d14e" => :mojave
+    sha256 "4d278399b30ee9b7739f13d0da8c1daef781bdb91d2aebe8c2eea0fa3702f456" => :high_sierra
   end
 
   head do
     url "https://github.com/dbry/WavPack.git"
-    depends_on "automake" => :build
     depends_on "autoconf" => :build
+    depends_on "automake" => :build
     depends_on "libtool" => :build
   end
 

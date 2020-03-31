@@ -1,33 +1,27 @@
 class JsonFortran < Formula
   desc "Fortran 2008 JSON API"
   homepage "https://github.com/jacobwilliams/json-fortran"
-  url "https://github.com/jacobwilliams/json-fortran/archive/6.2.0.tar.gz"
-  sha256 "7a68fcff175719815b7c5ad17b98e1eceed4529dd94078e6fabc381d2bc60955"
+  url "https://github.com/jacobwilliams/json-fortran/archive/7.1.0.tar.gz"
+  sha256 "e7aa1f6e09b25ebacb17188147380c3f8c0a254754cd24869c001745fcecc9e6"
   head "https://github.com/jacobwilliams/json-fortran.git"
 
   bottle do
     cellar :any
-    sha256 "e016f9be8526b327654efd35fcceaf2c67a527111506ef31dff7e8d052f5e154" => :high_sierra
-    sha256 "11d23e9f8ec4643eb9ba2c76ac92160208efc3d897f9bedd11a4694d4f20eb40" => :sierra
-    sha256 "4850076213f1073611bd6f77e907853972fe2ac851880086d254149910d35c48" => :el_capitan
+    sha256 "6c78e3ce735562f37b3f37a6d69363fdc75ffaf86f4d77a216b0aa49a9ac02a0" => :catalina
+    sha256 "cb39426c08042ad364fac5a0d33dbfb3fa1aaf1cb4dbfca588f55c1377682482" => :mojave
+    sha256 "2f485777f4d42f9efc26e04d5e9e5022dd125a98fae3836e68c2cc4dd380ee2a" => :high_sierra
+    sha256 "02426bf82ef55161c1b698fa68d455f35705bad09e04b07586d8ed9f44775f90" => :sierra
   end
 
-  option "with-unicode-support", "Build json-fortran to support unicode text in json objects and files"
-  option "without-docs", "Do not build and install FORD generated documentation for json-fortran"
-
-  deprecated_option "without-robodoc" => "without-docs"
-
   depends_on "cmake" => :build
-  depends_on "ford" => :build if build.with? "docs"
+  depends_on "ford" => :build
   depends_on "gcc" # for gfortran
 
   def install
     mkdir "build" do
-      args = std_cmake_args
-      args << "-DUSE_GNU_INSTALL_CONVENTION:BOOL=TRUE" # Use more GNU/Homebrew-like install layout
-      args << "-DENABLE_UNICODE:BOOL=TRUE" if build.with? "unicode-support"
-      args << "-DSKIP_DOC_GEN:BOOL=TRUE" if build.without? "docs"
-      system "cmake", "..", *args
+      system "cmake", "..", *std_cmake_args,
+                            "-DUSE_GNU_INSTALL_CONVENTION:BOOL=TRUE",
+                            "-DENABLE_UNICODE:BOOL=TRUE"
       system "make", "install"
     end
   end

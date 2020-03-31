@@ -2,23 +2,24 @@ class Watch < Formula
   desc "Executes a program periodically, showing output fullscreen"
   homepage "https://gitlab.com/procps-ng/procps"
   url "https://gitlab.com/procps-ng/procps.git",
-      :tag => "v3.3.13",
-      :revision => "2fc2427ed374f96a5079e4b8b4a6d36192c873ac"
+      :tag      => "v3.3.16",
+      :revision => "59c88e18f29000ceaf7e5f98181b07be443cf12f"
   head "https://gitlab.com/procps-ng/procps.git"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "42288882673f4abdc89ee24cb88d2e76f2b32fec5d06148a26511b56c5be7ac3" => :high_sierra
-    sha256 "ced897f72a92f243c81e20b62edda6daf32652d22752b2c12e305d42ebc6fdca" => :sierra
-    sha256 "33b30a5929a98457abc9da46956d68bcc8059992f6386b8507a1c6c7b460355f" => :el_capitan
+    cellar :any
+    sha256 "011e48363fe62c7a4ba0dec746d5964ee25545bde7855a31db0cb411420df190" => :catalina
+    sha256 "d17aba6f80c530e6b91b30e088df60aab3dc84b2f57ca7499928322438b9f0d2" => :mojave
+    sha256 "13d63ebc419965182d98f10b25cc99961679e1ba5ce6118e66b7037eb4e78de8" => :high_sierra
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
+  depends_on "gettext" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
 
-  depends_on "gettext"
+  depends_on "ncurses"
 
   conflicts_with "visionmedia-watch"
 
@@ -26,7 +27,8 @@ class Watch < Formula
     system "autoreconf", "-fiv"
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
-                          "--disable-nls"
+                          "--disable-nls",
+                          "--enable-watch8bit"
     system "make", "watch"
     bin.install "watch"
     man1.install "watch.1"

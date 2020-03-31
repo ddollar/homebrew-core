@@ -1,16 +1,19 @@
 class Kumo < Formula
   desc "Word Clouds in Java"
   homepage "https://github.com/kennycason/kumo"
-  url "https://search.maven.org/remotecontent?filepath=com/kennycason/kumo-cli/1.13/kumo-cli-1.13.jar"
-  sha256 "c9ad525f7d6aec9e2c06cf10017e1e533f43b1b3c4df5aa0d4b137f8d563c5c6"
+  url "https://search.maven.org/remotecontent?filepath=com/kennycason/kumo-cli/1.22/kumo-cli-1.22.jar"
+  sha256 "5a4aebd6074a0dd4ae493380a54b96f9b571446673fd82c764ed0b9f37511cab"
 
   bottle :unneeded
 
-  depends_on :java => "1.8+"
+  depends_on "openjdk"
 
   def install
     libexec.install "kumo-cli-#{version}.jar"
-    bin.write_jar_script libexec/"kumo-cli-#{version}.jar", "kumo"
+    (bin/"kumo").write <<~EOS
+      #!/bin/bash
+      exec "#{Formula["openjdk"].opt_bin}/java" -jar "#{libexec}/kumo-cli-#{version}.jar" "$@"
+    EOS
   end
 
   test do

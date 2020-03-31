@@ -16,7 +16,7 @@ class ApacheBrooklynCli < Formula
 
   def install
     ENV["XC_OS"] = "darwin"
-    ENV["XC_ARCH"] = MacOS.prefer_64_bit? ? "amd64" : "386"
+    ENV["XC_ARCH"] = "amd64"
     ENV["GOPATH"] = buildpath
     ENV["GOBIN"] = bin
     ENV["GLIDE_HOME"] = HOMEBREW_CACHE/"glide_home/#{name}"
@@ -48,7 +48,8 @@ class ApacheBrooklynCli < Formula
 
     begin
       mock_brooklyn_url = "http://localhost:#{server.addr[1]}"
-      assert_equal "Connected to Brooklyn version 1.2.3 at #{mock_brooklyn_url}\n", shell_output("#{bin}/br login #{mock_brooklyn_url} username password")
+      assert_equal "Connected to Brooklyn version 1.2.3 at #{mock_brooklyn_url}\n",
+        shell_output("#{bin}/br login #{mock_brooklyn_url} username password")
     ensure
       Process.kill("KILL", pid_mock_brooklyn)
     end

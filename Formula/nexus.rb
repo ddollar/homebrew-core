@@ -1,9 +1,9 @@
 class Nexus < Formula
   desc "Repository manager for binary software components"
   homepage "https://www.sonatype.org/"
-  url "https://sonatype-download.global.ssl.fastly.net/nexus/oss/nexus-2.14.5-02-bundle.tar.gz"
-  version "2.14.5-02"
-  sha256 "e63ecd36d2daec6f406793864510b1f516b9a6c9cf1842e204fca95b58070c22"
+  url "https://sonatype-download.global.ssl.fastly.net/repository/repositoryManager/oss/nexus-2.14.13-01-bundle.tar.gz"
+  version "2.14.13-01"
+  sha256 "66e2ae803af26c6af34a82cc510d7fa2037080f35a72b4398f65d2f157fd3afc"
 
   bottle :unneeded
 
@@ -19,22 +19,23 @@ class Nexus < Formula
 
   plist_options :manual => "nexus start"
 
-  def plist; <<~EOS
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    <plist version="1.0">
-      <dict>
-        <key>Label</key>
-        <string>com.sonatype.nexus</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_bin}/nexus</string>
-          <string>start</string>
-        </array>
-        <key>RunAtLoad</key>
-      <true/>
-      </dict>
-    </plist>
+  def plist
+    <<~EOS
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+        <dict>
+          <key>Label</key>
+          <string>com.sonatype.nexus</string>
+          <key>ProgramArguments</key>
+          <array>
+            <string>#{opt_bin}/nexus</string>
+            <string>start</string>
+          </array>
+          <key>RunAtLoad</key>
+        <true/>
+        </dict>
+      </plist>
     EOS
   end
 

@@ -1,34 +1,44 @@
 class PerconaToolkit < Formula
   desc "Percona Toolkit for MySQL"
   homepage "https://www.percona.com/software/percona-toolkit/"
-  url "https://www.percona.com/downloads/percona-toolkit/3.0.8/source/tarball/percona-toolkit-3.0.8.tar.gz"
-  sha256 "cc287785f5c17effad2ae251eaa60a61d503a4d2d083dc63b81b50edf6f2f4c9"
+  url "https://www.percona.com/downloads/percona-toolkit/3.1.0/source/tarball/percona-toolkit-3.1.0.tar.gz"
+  sha256 "722593773825efe7626ff0b74de6a2133483c9c89fd7812bfe440edaacaec9cc"
+  revision 1
   head "lp:percona-toolkit", :using => :bzr
 
   bottle do
     cellar :any
-    sha256 "80206ccb44f316868b2f2d6c58ce6c3830696114d9775c86849a4c8a69d5956e" => :high_sierra
-    sha256 "3e151113cc4c1488ebb4bc09cd87aba8f8093fbfa21193c811a0ebd54e32a946" => :sierra
-    sha256 "30e054ecf7a4ca8192389687243380bb4bbaa41fe3cdb5009a96e54a8e17fa29" => :el_capitan
+    sha256 "12db01f1fa8f1f2d9dbce405dcd84f61e94ec47466bb33a9b167e3f0c4ad2133" => :catalina
+    sha256 "aba147044860a0b45f6dcac78856942f1f633af6aa748f59f443678b566248c8" => :mojave
+    sha256 "ab0ad14f2a7b9acc5aa43e798ed1605381aad0a4ff87d02ca963403231ac1c12" => :high_sierra
   end
 
-  depends_on "mysql"
-  depends_on "openssl"
+  depends_on "mysql-client"
+  depends_on "openssl@1.1"
+
+  uses_from_macos "perl"
+
+  # In Mojave, this is not part of the system Perl anymore
+  if MacOS.version >= :mojave
+    resource "DBI" do
+      url "https://cpan.metacpan.org/authors/id/T/TI/TIMB/DBI-1.642.tar.gz"
+      sha256 "3f2025023a56286cebd15cb495e36ccd9b456c3cc229bf2ce1f69e9ebfc27f5d"
+    end
+  end
 
   resource "DBD::mysql" do
     url "https://cpan.metacpan.org/authors/id/C/CA/CAPTTOFU/DBD-mysql-4.046.tar.gz"
-    mirror "http://search.cpan.org/CPAN/authors/id/C/CA/CAPTTOFU/DBD-mysql-4.046.tar.gz"
     sha256 "6165652ec959d05b97f5413fa3dff014b78a44cf6de21ae87283b28378daf1f7"
   end
 
   resource "JSON" do
-    url "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/JSON-2.97001.tar.gz"
-    mirror "http://search.cpan.org/CPAN/authors/id/I/IS/ISHIGAKI/JSON-2.97001.tar.gz"
-    sha256 "e277d9385633574923f48c297e1b8acad3170c69fa590e31fa466040fc6f8f5a"
+    url "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/JSON-4.00.tar.gz"
+    sha256 "c4da1f1075878604b7b1f085ff3963e1073ed1c603c3bc9f0b0591e3831a1068"
   end
 
   def install
     ENV.prepend_create_path "PERL5LIB", libexec/"lib/perl5"
+
     resources.each do |r|
       r.stage do
         system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}"
@@ -37,8 +47,17 @@ class PerconaToolkit < Formula
     end
 
     system "perl", "Makefile.PL", "INSTALL_BASE=#{prefix}"
-    system "make", "test", "install"
+    system "make", "install"
     share.install prefix/"man"
+
+    # Disable dynamic selection of perl which may cause segfault when an
+    # incompatible perl is picked up.
+    # https://github.com/Homebrew/homebrew-core/issues/4936
+    non_perl_files = %w[bin/pt-ioprofile bin/pt-mext bin/pt-mysql-summary
+                        bin/pt-pmp bin/pt-sift bin/pt-stalk bin/pt-summary]
+    perl_files = Dir["bin/*"] - non_perl_files
+    inreplace perl_files, "#!/usr/bin/env perl", "#!/usr/bin/perl"
+
     bin.env_script_all_files(libexec/"bin", :PERL5LIB => ENV["PERL5LIB"])
   end
 

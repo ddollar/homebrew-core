@@ -1,14 +1,14 @@
 class GoogleAuthenticatorLibpam < Formula
   desc "PAM module for two-factor authentication"
   homepage "https://github.com/google/google-authenticator-libpam"
-  url "https://github.com/google/google-authenticator-libpam/archive/1.05.tar.gz"
-  sha256 "862412d6927ee1a19d81150006d53c21935897ba6d033616c31fc4d6aaa4db08"
+  url "https://github.com/google/google-authenticator-libpam/archive/1.08.tar.gz"
+  sha256 "6f6d7530261ba9e2ece84214f1445857d488b7851c28a58356b49f2d9fd36290"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "6b76859ee4008c2d66712585617f0b47d5a40cb4583fda5784f9b7f05260387e" => :high_sierra
-    sha256 "1082f7a7a81ac9e3045176b66baedbdf956aca8ccd7e4b008013b24f0d2ed3c2" => :sierra
-    sha256 "2d48707e7e2dc9821c6954295c983ad76c9edcd6bac71f9da1cb2ecdb7b560a2" => :el_capitan
+    sha256 "024679fc7963c416632e422af276ab10bb129740c7d081fadb9ee936695f57da" => :catalina
+    sha256 "2317849932e770a926b427589058d6b552326d84376f714199e75aa9c922377d" => :mojave
+    sha256 "b94306ade72a66cb67a8d3929f98349a01fd33b2b382a457bfecb8e1dde17380" => :high_sierra
   end
 
   depends_on "autoconf" => :build
@@ -24,22 +24,23 @@ class GoogleAuthenticatorLibpam < Formula
     system "make", "install"
   end
 
-  def caveats; <<~EOS
-    Add 2-factor authentication for ssh:
-      echo "auth required #{opt_lib}/security/pam_google_authenticator.so" \\
-      | sudo tee -a /etc/pam.d/sshd
+  def caveats
+    <<~EOS
+      Add 2-factor authentication for ssh:
+        echo "auth required #{opt_lib}/security/pam_google_authenticator.so" \\
+        | sudo tee -a /etc/pam.d/sshd
 
-    Add 2-factor authentication for ssh allowing users to log in without OTP:
-      echo "auth required #{opt_lib}/security/pam_google_authenticator.so" \\
-      "nullok" | sudo tee -a /etc/pam.d/sshd
+      Add 2-factor authentication for ssh allowing users to log in without OTP:
+        echo "auth required #{opt_lib}/security/pam_google_authenticator.so" \\
+        "nullok" | sudo tee -a /etc/pam.d/sshd
 
-    (Or just manually edit /etc/pam.d/sshd)
+      (Or just manually edit /etc/pam.d/sshd)
     EOS
   end
 
   test do
     system "#{bin}/google-authenticator", "--force", "--time-based",
            "--disallow-reuse", "--rate-limit=3", "--rate-time=30",
-           "--window-size=3"
+           "--window-size=3", "--no-confirm"
   end
 end

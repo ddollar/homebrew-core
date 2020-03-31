@@ -1,22 +1,20 @@
 class Stlink < Formula
   desc "STM32 discovery line Linux programmer"
   homepage "https://github.com/texane/stlink"
-  url "https://github.com/texane/stlink/archive/1.5.0.tar.gz"
-  sha256 "ce26b3db73f0bdf87ced78a2a90f3d515914f7d1211b1ca4b9acdf1882ca9d81"
-
+  url "https://github.com/texane/stlink/archive/v1.6.0.tar.gz"
+  sha256 "5575e9322e6914fad3bcbcad77fa2669e4b1853cd49bed44bfac1c68992f538a"
   head "https://github.com/texane/stlink.git"
 
   bottle do
     cellar :any
-    sha256 "4315b392911292547e652ef382b6fd26f6d37522997e9be560c5a08808b116ac" => :high_sierra
-    sha256 "33f865238b5f5e3a994a180aa0a580f8faf05c6dda43eac1e52a522091526fdf" => :sierra
-    sha256 "ccbaf675310990051e49e0aa53e29f64c54fa9dee4b9d80dd414af0a94aa7694" => :el_capitan
+    sha256 "37847a2056adeb51918e7f660a92c6d13e8959e7527de2f9988c8b3c247c4e3f" => :catalina
+    sha256 "afafd4057259f0971e38fc899b86d2543e216e011a384d16396fcdc1126277a3" => :mojave
+    sha256 "626bf84c5d2a98f0824b1d2da49047f8587d949b4fe26ad02c0d3211509bbf2b" => :high_sierra
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
   depends_on "libusb"
-  depends_on "gtk+3" => :optional
 
   def install
     system "cmake", ".", *std_cmake_args
@@ -24,6 +22,6 @@ class Stlink < Formula
   end
 
   test do
-    system bin/"st-util", "-h"
+    assert_match "st-flash #{version}", shell_output("#{bin}/st-flash --debug reset 2>&1", 255)
   end
 end

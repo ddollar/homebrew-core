@@ -1,7 +1,7 @@
 class Libspatialite < Formula
   desc "Adds spatial SQL capabilities to SQLite"
   homepage "https://www.gaia-gis.it/fossil/libspatialite/index"
-  revision 6
+  revision 8
 
   stable do
     url "https://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-4.3.0a.tar.gz"
@@ -17,9 +17,9 @@ class Libspatialite < Formula
 
   bottle do
     cellar :any
-    sha256 "2a41b0baab67ec8b35f3c68b392439907a1b003a84437b8437b3ca3ecdcf35f4" => :high_sierra
-    sha256 "4b73791b59c7766a4e20d9ca77502d2866f7d07fb7aeba660bf38e41077ba60e" => :sierra
-    sha256 "eff5f3de6139cfe0adff6ec2fe306c7f11ee1f7b9195089d514902b11b0675d0" => :el_capitan
+    sha256 "e8bd429119857fab4cb51f3ba7b64024b51eb2400873e71fc9d6aad297c109ce" => :catalina
+    sha256 "8fcc2ccaf861f94c3fb41b1c6435e86f52a7fe70e66d9e02a5acb16d285c4360" => :mojave
+    sha256 "a77ac13e3758d389ccf42fa62d8a7bb528062c215e2b380b8d3df7211696712f" => :high_sierra
   end
 
   head do
@@ -29,19 +29,15 @@ class Libspatialite < Formula
     depends_on "libtool" => :build
   end
 
-  option "without-freexl", "Build without support for reading Excel files"
-  option "without-libxml2", "Disable support for xml parsing (parsing needed by spatialite-gui)"
-  option "without-geopackage", "Build without OGC GeoPackage support"
-
   depends_on "pkg-config" => :build
-  depends_on "proj"
+  depends_on "freexl"
   depends_on "geos"
+  depends_on "libxml2"
+  depends_on "proj"
   # Needs SQLite > 3.7.3 which rules out system SQLite on Snow Leopard and
   # below. Also needs dynamic extension support which rules out system SQLite
   # on Lion. Finally, RTree index support is required as well.
   depends_on "sqlite"
-  depends_on "libxml2" => :recommended
-  depends_on "freexl" => :recommended
 
   def install
     system "autoreconf", "-fi" if build.head?
@@ -53,11 +49,16 @@ class Libspatialite < Formula
     inreplace "configure",
               "shrext_cmds='`test .$module = .yes && echo .so || echo .dylib`'",
               "shrext_cmds='.dylib'"
+    chmod 0755, "configure"
 
     # Ensure Homebrew's libsqlite is found before the system version.
     sqlite = Formula["sqlite"]
     ENV.append "LDFLAGS", "-L#{sqlite.opt_lib}"
     ENV.append "CFLAGS", "-I#{sqlite.opt_include}"
+
+    # Use Proj 6.0.0 compatibility headers.
+    # Remove in libspatialite 5.0.0
+    ENV.append_to_cflags "-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H"
 
     args = %W[
       --disable-dependency-tracking
@@ -65,9 +66,6 @@ class Libspatialite < Formula
       --with-sysroot=#{HOMEBREW_PREFIX}
       --enable-geocallbacks
     ]
-    args << "--enable-freexl=no" if build.without? "freexl"
-    args << "--enable-libxml2=no" if build.without? "libxml2"
-    args << "--enable-geopackage=no" if build.without? "geopackage"
 
     system "./configure", *args
     system "make", "install"

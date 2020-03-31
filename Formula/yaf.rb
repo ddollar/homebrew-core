@@ -1,19 +1,27 @@
 class Yaf < Formula
   desc "Yet another flowmeter: processes packet data from pcap(3)"
   homepage "https://tools.netsa.cert.org/yaf/"
-  url "https://tools.netsa.cert.org/releases/yaf-2.9.3.tar.gz"
-  sha256 "a0dd7f8f8733b8554ee0b1458a38fad19734899313ed4a4eb9bcf96893d98e02"
+  url "https://tools.netsa.cert.org/releases/yaf-2.11.0.tar.gz"
+  sha256 "5e2523eeeaa5ac7e08f73b38c599f321ba93f239011efec9c39cfcbc30489dca"
+  revision 1
 
   bottle do
     cellar :any
-    sha256 "24422434ea23843b2ae740613df6e275d6ca7428fb18edf6d859a8e424da8fe4" => :high_sierra
-    sha256 "07ed2f7990b8ba323ea4086c33d6c1dad14dd9896b2e477f2e72d229b2666155" => :sierra
-    sha256 "a78d64bc822e5238b8959c29f6b2fd3b0c5dd394e035f467115fae1a00e5f8c8" => :el_capitan
+    rebuild 1
+    sha256 "62355ef76633be429f5a281b1a357fa74d12e33ffaf5c2e38b0291442cb1f9fd" => :catalina
+    sha256 "7395026369a9b4b30f6614ab98baa1d810de2af29511b635b3ba2ad5a3d82289" => :mojave
+    sha256 "3e4ba45a90c4a47bcb4edc7dd9d9bf227d8b70af3989368bbf6cc4b006d2a9f7" => :high_sierra
+    sha256 "f9f45a164b81d2b4d4ef3b45664faa81d8317039cee93b69a1f4dc2d55786068" => :sierra
   end
 
   depends_on "pkg-config" => :build
+  depends_on "gettext"
   depends_on "glib"
   depends_on "libfixbuf"
+  depends_on "libtool"
+  depends_on "pcre"
+
+  uses_from_macos "libpcap"
 
   def install
     system "./configure", "--disable-dependency-tracking",
@@ -25,7 +33,9 @@ class Yaf < Formula
   test do
     input = test_fixtures("test.pcap")
     output = `#{bin}/yaf --in #{input} | #{bin}/yafscii`
-    expected = "2014-10-02 10:29:06.168 - 10:29:06.169 (0.001 sec) tcp 192.168.1.115:51613 => 192.168.1.118:80 71487608:98fc8ced S/APF:AS/APF (7/453 <-> 5/578) rtt 0 ms"
+    expected = "2014-10-02 10:29:06.168 - 10:29:06.169 (0.001 sec) tcp " \
+               "192.168.1.115:51613 => 192.168.1.118:80 71487608:98fc8ced " \
+               "S/APF:AS/APF (7/453 <-> 5/578) rtt 0 ms"
     assert_equal expected, output.strip
   end
 end

@@ -1,25 +1,23 @@
 class Libupnp < Formula
   desc "Portable UPnP development kit"
   homepage "https://pupnp.sourceforge.io/"
-  url "https://downloads.sourceforge.net/project/pupnp/pupnp/libUPnP%201.6.25/libupnp-1.6.25.tar.bz2"
-  sha256 "c5a300b86775435c076d58a79cc0d5a977d76027d2a7d721590729b7f369fa43"
+  url "https://github.com/pupnp/pupnp/releases/download/release-1.12.0/libupnp-1.12.0.tar.bz2"
+  sha256 "1bda3939976a9a2901382233db39379ce993b59a0e7fd0dd781212a44a9b44a2"
 
   bottle do
     cellar :any
-    sha256 "cbca37b45cb652c73d4c5ae0ae087338bb4c606f5be4306c5d998c39c382bb4b" => :high_sierra
-    sha256 "b870845572dd6d11ed90fedfb367bbd53066f6b9c90e522b97ce88ae53ccddfe" => :sierra
-    sha256 "9b660881232e6ce94a375962c1df55f179f69335c7d11907b9a9c5dd81693360" => :el_capitan
+    sha256 "64f8a5b5aba6881e7729c1648a548aac8eed1b15dc3efb6cd8b610dde0cb4e96" => :catalina
+    sha256 "eac1001e055b7c658748548812ff917b466cd48722058c853a332cbff19201cb" => :mojave
+    sha256 "8b94bfb79baec4a60f7a0645938e58fff59067531ad80bb00381c73453435c56" => :high_sierra
   end
-
-  option "without-ipv6", "Disable IPv6 support"
 
   def install
     args = %W[
       --disable-debug
       --disable-dependency-tracking
       --prefix=#{prefix}
+      --enable-ipv6
     ]
-    args << "--enable-ipv6" if build.with? "ipv6"
 
     system "./configure", *args
     system "make", "install"

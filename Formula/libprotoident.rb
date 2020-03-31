@@ -1,18 +1,19 @@
 class Libprotoident < Formula
   desc "Performs application layer protocol identification for flows"
   homepage "https://research.wand.net.nz/software/libprotoident.php"
-  url "https://research.wand.net.nz/software/libprotoident/libprotoident-2.0.12.tar.gz"
-  sha256 "c09aba4882837c7f9ebf4ad153b637a9a7cbd5a2b4b398e10ddb63e74f270fac"
+  url "https://research.wand.net.nz/software/libprotoident/libprotoident-2.0.13.tar.gz"
+  sha256 "8ca7ccd95b3f23457c3f9eff480364565b553bbcab9b39969f964910738e5672"
 
   bottle do
     cellar :any
-    sha256 "48a4b98343c8a875dc429c11f0e65b2d4afbd66e631aa390deb71eca16dfc55d" => :high_sierra
-    sha256 "e353b002c9c3180965daadadf13273ab2f74fc6ec4701ba99a8231aaf4e9e3e0" => :sierra
-    sha256 "9a631567b1642854a7d8572f047cf4e02fff34bae11c43e7d91dbf16c0529a3b" => :el_capitan
+    rebuild 1
+    sha256 "8db46b2b98a50a616d8f1820defead65ffaf5ba5c01b8480858395b64d45f5b6" => :catalina
+    sha256 "1143ffb528f58cf2ae55cf461fad927bf91ef14125dc2b9cbfbcefae908a96d9" => :mojave
+    sha256 "4305f7265ff0343178f0f6019889878c299a1e55a8aaac14c1382445aa0ac600" => :high_sierra
   end
 
-  depends_on "libtrace"
   depends_on "libflowmanager"
+  depends_on "libtrace"
 
   def install
     system "./configure", "--disable-dependency-tracking",

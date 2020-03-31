@@ -1,18 +1,19 @@
 class Zenity < Formula
   desc "GTK+ dialog boxes for the command-line"
-  homepage "https://live.gnome.org/Zenity"
-  url "https://download.gnome.org/sources/zenity/3.28/zenity-3.28.0.tar.xz"
-  sha256 "5e588f12b987db30139b0283d39d19b0fd47cab87840cc112dfe61e592826df8"
+  homepage "https://wiki.gnome.org/Projects/Zenity"
+  url "https://download.gnome.org/sources/zenity/3.32/zenity-3.32.0.tar.xz"
+  sha256 "e786e733569c97372c3ef1776e71be7e7599ebe87e11e8ad67dcc2e63a82cd95"
   revision 1
 
   bottle do
-    sha256 "5dab38ba82de1d4c39d6fa64d2bd5643b255de4f5948ea08b9e5fe8a49329b92" => :high_sierra
-    sha256 "a5d79a66c453fd0052794a449fa9c7d1beff2028037149d7449e7227a1f823a8" => :sierra
-    sha256 "0ed7b7cad1724fed11fa31f9afbbc327dc00983c84326dc6d944ce73c0c87275" => :el_capitan
+    sha256 "6bbf833a5a7d71346a5391fae436c2c46f530f0f5b9ac5d57330601b3456db49" => :catalina
+    sha256 "cef54fcd5601eb5dd3b563d1a09a6cd83654a2fa46e4a83a3d3c6e6a356fe29a" => :mojave
+    sha256 "36cf68d4838890e8d9122109464548a4630da0b06dcf6d4f0976ccf58b99dde2" => :high_sierra
+    sha256 "8b06d6cfec84ff39a95aeb4b466c1eb62584ff019ed90331334d243501cc8398" => :sierra
   end
 
-  depends_on "pkg-config" => :build
   depends_on "itstool" => :build
+  depends_on "pkg-config" => :build
   depends_on "gtk+3"
 
   def install

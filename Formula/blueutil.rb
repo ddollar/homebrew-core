@@ -1,16 +1,16 @@
 class Blueutil < Formula
   desc "Get/set bluetooth power and discoverable state"
   homepage "https://github.com/toy/blueutil"
-  url "https://github.com/toy/blueutil/archive/v2.0.0.tar.gz"
-  sha256 "14c88c759cfb5212e656dab66fb2ec9ed1e835627e555cdf76838bb4bde062b2"
-
+  url "https://github.com/toy/blueutil/archive/v2.5.1.tar.gz"
+  sha256 "a53f82a5b743199600854bebcb79215d30444b0c7d71e0e41213122ecfe64b47"
   head "https://github.com/toy/blueutil.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "35844a1dc11c167af1f55575c7972dd0c869114adf2d8f235d801463111ebae6" => :high_sierra
-    sha256 "0cf9d2cacfabb11ee572ed71a0b5933349492604f5e571d8dc6473862c29cfb8" => :sierra
-    sha256 "6f74477ee1d42cf516e1a9d71d522d294a80dbcd250a24aec344c2fd4f6c49af" => :el_capitan
+    sha256 "07d591966a3ec87ad85f578b5ec4883b2c62e473fc39594cd3fefe6e02c24087" => :catalina
+    sha256 "d6a015cf0a804d549503fde0db6d7a9a08dd120f69bda40015633e1229addddf" => :mojave
+    sha256 "eee630fbd13d0e43655e9f1f5d03431c033aa3b041a934e4ca3ca903ab49538c" => :high_sierra
+    sha256 "32e9882536b3e4008522e4cf82475a8c9b94a705892d3812dd1975ba4a8ac36d" => :sierra
   end
 
   depends_on :xcode => :build

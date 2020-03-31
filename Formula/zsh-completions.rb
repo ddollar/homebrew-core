@@ -1,9 +1,8 @@
 class ZshCompletions < Formula
   desc "Additional completion definitions for zsh"
   homepage "https://github.com/zsh-users/zsh-completions"
-  url "https://github.com/zsh-users/zsh-completions/archive/0.27.0.tar.gz"
-  sha256 "9b817b73e709aca0e7e5a41471b5b63467d1e7aa69ef755b6ce39b99e61cd47a"
-
+  url "https://github.com/zsh-users/zsh-completions/archive/0.31.0.tar.gz"
+  sha256 "6c1cccf6fd8c7d875145e357e3a46680b74013b6fc7b98724801126c072fc024"
   head "https://github.com/zsh-users/zsh-completions.git"
 
   bottle :unneeded
@@ -16,7 +15,12 @@ class ZshCompletions < Formula
     <<~EOS
       To activate these completions, add the following to your .zshrc:
 
-        fpath=(#{HOMEBREW_PREFIX}/share/zsh-completions $fpath)
+        if type brew &>/dev/null; then
+          FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+
+          autoload -Uz compinit
+          compinit
+        fi
 
       You may also need to force rebuild `zcompdump`:
 

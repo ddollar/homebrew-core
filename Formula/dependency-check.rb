@@ -1,12 +1,12 @@
 class DependencyCheck < Formula
   desc "OWASP dependency-check"
   homepage "https://www.owasp.org/index.php/OWASP_Dependency_Check"
-  url "https://dl.bintray.com/jeremy-long/owasp/dependency-check-3.1.1-release.zip"
-  sha256 "a58a5671f8900562a4b92d1f416ef32b0eb376dab560faedf00af95f14e94705"
+  url "https://dl.bintray.com/jeremy-long/owasp/dependency-check-5.3.1-release.zip"
+  sha256 "fa7b38b5bffced0455f30173ae613e5304c6a82a1a0f341fb6c44fd3eafc2e85"
 
   bottle :unneeded
 
-  depends_on :java
+  depends_on "openjdk"
 
   def install
     rm_f Dir["bin/*.bat"]
@@ -14,21 +14,21 @@ class DependencyCheck < Formula
     chmod 0755, "bin/dependency-check.sh"
     libexec.install Dir["*"]
 
-    mv libexec/"bin/dependency-check.sh", libexec/"bin/dependency-check"
-    bin.install_symlink libexec/"bin/dependency-check"
+    (bin/"dependency-check").write_env_script libexec/"bin/dependency-check.sh",
+      :JAVA_HOME => Formula["openjdk"].opt_prefix
 
     (var/"dependencycheck").mkpath
     libexec.install_symlink var/"dependencycheck" => "data"
 
     (etc/"dependencycheck").mkpath
     jar = "dependency-check-core-#{version}.jar"
-    corejar = libexec/"repo/org/owasp/dependency-check-core/#{version}/#{jar}"
+    corejar = libexec/"lib/#{jar}"
     system "unzip", "-o", corejar, "dependencycheck.properties", "-d", libexec/"etc"
     (etc/"dependencycheck").install_symlink libexec/"etc/dependencycheck.properties"
   end
 
   test do
-    output = shell_output("#{libexec}/bin/dependency-check --version").strip
+    output = shell_output("#{bin}/dependency-check --version").strip
     assert_match "Dependency-Check Core version #{version}", output
 
     (testpath/"temp-props.properties").write <<~EOS

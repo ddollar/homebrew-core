@@ -1,19 +1,26 @@
 class Libmonome < Formula
   desc "Interact with monome devices via C, Python, or FFI"
   homepage "https://monome.org/"
-  url "https://github.com/monome/libmonome/archive/v1.4.1.tar.gz"
-  sha256 "a79af7e22f835f2414f12503981d6a40527e0d006a03fd85aec59a6029ffc06c"
+  url "https://github.com/monome/libmonome/archive/v1.4.2.tar.gz"
+  sha256 "d8f87fc8240214c2ca433f4b185eb3ddbace2065f95487e5d9ac0ab60220393d"
   head "https://github.com/monome/libmonome.git"
 
   bottle do
-    sha256 "5e8452d3349ea98e6d8a72cdcf2bdfd4224c1d07a421823217f825e92c655933" => :high_sierra
-    sha256 "1d91d19c2c14b1c03e08d3ffe9b71e570a0751057a6201ef5ba6e56bab6ab9b9" => :sierra
-    sha256 "a44ad5902f185e66d50f9f7aace7073964e8fe9d2c912fa036e14dd24fd8486c" => :el_capitan
+    cellar :any
+    rebuild 2
+    sha256 "2f50af40811f13ee3dc2a372c98a3efa413d55a311093c1e34a9fabedda624e0" => :catalina
+    sha256 "edd05ad00d159e4cb6ff44306d94e981891a2009999706700f614f4127feeef8" => :mojave
+    sha256 "c99ff2d00d681cc2ea502023119bd29453000920142709fa6927259a2dca9584" => :high_sierra
   end
 
   depends_on "liblo"
 
   def install
+    # Fix build on Mojave
+    # https://github.com/monome/libmonome/issues/62
+    inreplace "wscript", /conf.env.append_unique.*-mmacosx-version-min=10.5.*/,
+                         "pass"
+
     system "./waf", "configure", "--prefix=#{prefix}"
     system "./waf", "build"
     system "./waf", "install"

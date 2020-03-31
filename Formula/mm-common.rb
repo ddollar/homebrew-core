@@ -1,19 +1,25 @@
 class MmCommon < Formula
   desc "Build utilities for C++ interfaces of GTK+ and GNOME packages"
   homepage "https://www.gtkmm.org/"
-  url "https://download.gnome.org/sources/mm-common/0.9/mm-common-0.9.11.tar.xz"
-  sha256 "20d1e7466ca4c83c92e29f9e8dfcc8e5721fdf1337f53157bed97be3b73b32a8"
+  url "https://download.gnome.org/sources/mm-common/1.0/mm-common-1.0.0.tar.xz"
+  sha256 "b97d9b041e5952486cab620b44ab09f6013a478f43b6699ae899b8a4da189cd4"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "3e8e813984958eb171d5a7aca5c4af2f284c75098f72d0478af424a03286506b" => :high_sierra
-    sha256 "c86ca9a93c9833d42971c03204b8a655b04e2444ffbc3f90126e7ba0c7411bd1" => :sierra
-    sha256 "c86ca9a93c9833d42971c03204b8a655b04e2444ffbc3f90126e7ba0c7411bd1" => :el_capitan
-    sha256 "c86ca9a93c9833d42971c03204b8a655b04e2444ffbc3f90126e7ba0c7411bd1" => :yosemite
+    sha256 "306e6e16c9ae197a492b8471fbfe8545709ba38b8deaa123cbea6739eeb8b807" => :catalina
+    sha256 "306e6e16c9ae197a492b8471fbfe8545709ba38b8deaa123cbea6739eeb8b807" => :mojave
+    sha256 "306e6e16c9ae197a492b8471fbfe8545709ba38b8deaa123cbea6739eeb8b807" => :high_sierra
   end
 
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "python"
+
   def install
-    system "./configure", "--disable-silent-rules", "--prefix=#{prefix}"
-    system "make", "install"
+    mkdir "build" do
+      system "meson", "--prefix=#{prefix}", ".."
+      system "ninja"
+      system "ninja", "install"
+    end
   end
 end

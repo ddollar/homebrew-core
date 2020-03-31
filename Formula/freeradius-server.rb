@@ -1,18 +1,22 @@
 class FreeradiusServer < Formula
   desc "High-performance and highly configurable RADIUS server"
   homepage "https://freeradius.org/"
-  url "ftp://ftp.freeradius.org/pub/freeradius/freeradius-server-3.0.16.tar.bz2"
-  sha256 "120cb1b75b434f8a2a9f9813da6df99ab92b8e6e24980353f314b04f517e0d84"
+  url "https://github.com/FreeRADIUS/freeradius-server/archive/release_3_0_20.tar.gz"
+  sha256 "8177fe550af6685a040884dbe3df28431bdc5a8d3a48a9f4f88bdb49f2d0e90c"
   head "https://github.com/FreeRADIUS/freeradius-server.git"
 
   bottle do
-    sha256 "ab26718f1e43040d1434b3e8b4d3a853a5a7188bf0b1fe243116a5b508656493" => :high_sierra
-    sha256 "9006602a414819b26e61825fc58b612b573a89752ca917e29a612ca6c8499807" => :sierra
-    sha256 "63b13e5024c636646078d5a6719996ce753e11b69e41751354db7e3068e1a132" => :el_capitan
+    sha256 "7fec2abc865717382300b1d55aa344fddd7fc52b4f6b10d28636fb98885dcefa" => :catalina
+    sha256 "1a5e48ff54c61244871fe183657d19b61ad0e4d83856c6fa32d455106727001a" => :mojave
+    sha256 "9e66599c564de99b959b348f2e24f5bd97e3975f4c1904f71bfd07c783748a08" => :high_sierra
   end
 
-  depends_on "openssl"
+  depends_on "openssl@1.1"
   depends_on "talloc"
+
+  uses_from_macos "perl"
+  uses_from_macos "readline"
+  uses_from_macos "sqlite"
 
   def install
     ENV.deparallelize
@@ -21,8 +25,8 @@ class FreeradiusServer < Formula
       --prefix=#{prefix}
       --sbindir=#{bin}
       --localstatedir=#{var}
-      --with-openssl-includes=#{Formula["openssl"].opt_include}
-      --with-openssl-libraries=#{Formula["openssl"].opt_lib}
+      --with-openssl-includes=#{Formula["openssl@1.1"].opt_include}
+      --with-openssl-libraries=#{Formula["openssl@1.1"].opt_lib}
       --with-talloc-lib-dir=#{Formula["talloc"].opt_lib}
       --with-talloc-include-dir=#{Formula["talloc"].opt_include}
     ]

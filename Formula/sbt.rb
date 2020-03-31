@@ -1,12 +1,14 @@
 class Sbt < Formula
   desc "Build tool for Scala projects"
   homepage "https://www.scala-sbt.org/"
-  url "https://github.com/sbt/sbt/releases/download/v1.1.2/sbt-1.1.2.tgz"
-  sha256 "5f77ce41a8a1e1faedb5952a2348b3137b9e001d675f2a79c6316496754cd270"
+  url "https://github.com/sbt/sbt/releases/download/v1.3.8/sbt-1.3.8.tgz"
+  mirror "https://sbt-downloads.cdnedge.bluemix.net/releases/v1.3.8/sbt-1.3.8.tgz"
+  sha256 "27b2ed49758011fefc1bd05e1f4156544d60673e082277186fdd33b6f55d995d"
+  revision 1
 
   bottle :unneeded
 
-  depends_on :java => "1.8+"
+  depends_on "openjdk"
 
   def install
     inreplace "bin/sbt" do |s|
@@ -23,22 +25,22 @@ class Sbt < Formula
         echo "Use of ~/.sbtconfig is deprecated, please migrate global settings to #{etc}/sbtopts" >&2
         . "$HOME/.sbtconfig"
       fi
+      export JAVA_HOME="${JAVA_HOME:-#{Formula["openjdk"].opt_prefix}}"
       exec "#{libexec}/bin/sbt" "$@"
     EOS
   end
 
-  def caveats;  <<~EOS
-    You can use $SBT_OPTS to pass additional JVM options to SBT:
-       SBT_OPTS="-XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M"
-
-    This formula uses the standard Lightbend sbt launcher script.
-    Project specific options should be placed in .sbtopts in the root of your project.
-    Global settings should be placed in #{etc}/sbtopts
+  def caveats
+    <<~EOS
+      You can use $SBT_OPTS to pass additional JVM options to sbt.
+      Project specific options should be placed in .sbtopts in the root of your project.
+      Global settings should be placed in #{etc}/sbtopts
     EOS
   end
 
   test do
     ENV.append "_JAVA_OPTIONS", "-Dsbt.log.noformat=true"
+    system "#{bin}/sbt", "about"
     assert_match "[info] #{version}", shell_output("#{bin}/sbt sbtVersion")
   end
 end

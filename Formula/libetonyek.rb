@@ -1,20 +1,24 @@
 class Libetonyek < Formula
   desc "Interpret and import Apple Keynote presentations"
   homepage "https://wiki.documentfoundation.org/DLP/Libraries/libetonyek"
-  url "https://dev-www.libreoffice.org/src/libetonyek/libetonyek-0.1.7.tar.xz"
-  sha256 "69dbe10d4426d52f09060d489f8eb90dfa1df592e82eb0698d9dbaf38cc734ac"
+  url "https://dev-www.libreoffice.org/src/libetonyek/libetonyek-0.1.9.tar.xz"
+  sha256 "e61677e8799ce6e55b25afc11aa5339113f6a49cff031f336e32fa58635b1a4a"
+  revision 1
 
   bottle do
-    sha256 "8cb44e63040162663d2145200a902bd4da40907a1e3ad630a43ce4a55f00f5ad" => :high_sierra
-    sha256 "77ce685537dc1bce0600e3c795699fd90004c0c38fc6735243028c7bc167070f" => :sierra
-    sha256 "385b7f6fbc971b66cb7b60aaaed207eee6a4f8f76af27dcff8104aff03320739" => :el_capitan
+    cellar :any
+    sha256 "c646035faf6b7213d1aa15a2e37478607f30ec3743b9af7fc4a83190f40b1941" => :catalina
+    sha256 "833ea6922b7e7eadd5446a9a1c8b6fe73fe49e4025703a63a90b8c4be966cb71" => :mojave
+    sha256 "7fdf62c11f4874c487d132fb24307e7a3ede2b03cfb231afff8872ae9c230c06" => :high_sierra
   end
 
-  depends_on "pkg-config" => :build
   depends_on "boost" => :build
-  depends_on "librevenge"
+  depends_on "pkg-config" => :build
   depends_on "glm"
+  depends_on "librevenge"
   depends_on "mdds"
+
+  uses_from_macos "libxml2"
 
   resource "liblangtag" do
     url "https://bitbucket.org/tagoh/liblangtag/downloads/liblangtag-0.6.2.tar.bz2"
@@ -36,7 +40,7 @@ class Libetonyek < Formula
                           "--disable-werror",
                           "--disable-tests",
                           "--prefix=#{prefix}",
-                          "--with-mdds=1.2"
+                          "--with-mdds=1.5"
     system "make", "install"
   end
 

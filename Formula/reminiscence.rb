@@ -1,14 +1,14 @@
 class Reminiscence < Formula
   desc "Flashback engine reimplementation"
   homepage "http://cyxdown.free.fr/reminiscence/"
-  url "http://cyxdown.free.fr/reminiscence/REminiscence-0.3.6.tar.bz2"
-  sha256 "7d3baf258e3b05e86a91b6cc33765367710821a9f18c88f11ae1384bb9884528"
+  url "http://cyxdown.free.fr/reminiscence/REminiscence-0.4.6.tar.bz2"
+  sha256 "a1738ca7df64cd34e75a0ada3110e70ed495260fda813bc9d8722b521fc6fee0"
 
   bottle do
     cellar :any
-    sha256 "afd2cd157db08a099a133474d2e39cfa0a84cf0f964f723d08e1c694150ce9d2" => :high_sierra
-    sha256 "1d7ec41316c4356bf9563e2b1edad2ebb360d4d2aee3b10b4f3cc3549572fffd" => :sierra
-    sha256 "5def6d20b975e17c0d988714efd1023b618594df8d7ab8f2fd9092df6ac35221" => :el_capitan
+    sha256 "08914eb6ff7af4b482d75d78f69b0d9b8f30df76bef4cd04e88ddc4e457d6b38" => :catalina
+    sha256 "a56001c98f255e684babd5ddbcb28e36ed8699c559730f28fc3939edcdb25a5e" => :mojave
+    sha256 "f6f27f326bb5020cced4c0e1c42f6f4638bfe05092440b51fd8257a1ce9e5288" => :high_sierra
   end
 
   depends_on "autoconf" => :build
@@ -19,18 +19,19 @@ class Reminiscence < Formula
   depends_on "libogg"
   depends_on "sdl2"
 
+  uses_from_macos "zlib"
+
   resource "tremor" do
     url "https://git.xiph.org/tremor.git",
-        :revision => "b56ffce0c0773ec5ca04c466bc00b1bbcaf65aef"
+        :revision => "7c30a66346199f3f09017a09567c6c8a3a0eedc8"
   end
 
   def install
     resource("tremor").stage do
-      system "autoreconf", "-fiv"
-      system "./configure", "--disable-dependency-tracking",
-                            "--disable-silent-rules",
-                            "--prefix=#{libexec}",
-                            "--disable-static"
+      system "./autogen.sh", "--disable-dependency-tracking",
+                             "--disable-silent-rules",
+                             "--prefix=#{libexec}",
+                             "--disable-static"
       system "make", "install"
     end
 

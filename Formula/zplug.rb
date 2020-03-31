@@ -7,8 +7,6 @@ class Zplug < Formula
 
   bottle :unneeded
 
-  depends_on "zsh" => :optional
-
   def install
     bin.install Dir["bin/*"]
     man1.install "doc/man/man1/zplug.1"
@@ -16,10 +14,11 @@ class Zplug < Formula
     touch prefix/"packages.zsh"
   end
 
-  def caveats; <<~EOS
-    In order to use zplug, please add the following to your .zshrc:
-      export ZPLUG_HOME=#{opt_prefix}
-      source $ZPLUG_HOME/init.zsh
+  def caveats
+    <<~EOS
+      In order to use zplug, please add the following to your .zshrc:
+        export ZPLUG_HOME=#{opt_prefix}
+        source $ZPLUG_HOME/init.zsh
     EOS
   end
 

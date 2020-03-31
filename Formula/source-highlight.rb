@@ -1,16 +1,15 @@
 class SourceHighlight < Formula
   desc "Source-code syntax highlighter"
   homepage "https://www.gnu.org/software/src-highlite/"
-  url "https://ftp.gnu.org/gnu/src-highlite/source-highlight-3.1.8.tar.gz"
-  mirror "https://ftpmirror.gnu.org/src-highlite/source-highlight-3.1.8.tar.gz"
-  mirror "https://fossies.org/linux/www/source-highlight-3.1.8.tar.gz"
-  sha256 "01336a7ea1d1ccc374201f7b81ffa94d0aecb33afc7d6903ebf9fbf33a55ada3"
-  revision 8
+  url "https://ftp.gnu.org/gnu/src-highlite/source-highlight-3.1.9.tar.gz"
+  mirror "https://ftpmirror.gnu.org/src-highlite/source-highlight-3.1.9.tar.gz"
+  sha256 "3a7fd28378cb5416f8de2c9e77196ec915145d44e30ff4e0ee8beb3fe6211c91"
+  revision 1
 
   bottle do
-    sha256 "3101cb3776039eba399f7a9d42cbd68120abaa2c3fd02401bd43128020bdf22c" => :high_sierra
-    sha256 "c8f9401b678b754e82d3cd7a78f6e7c164a1ece1832ca73ac77f11023de87de9" => :sierra
-    sha256 "d8f960586c5a0b5249ceacbe3996042fdfbce29a50c3adc65087e02f3daf361b" => :el_capitan
+    sha256 "fac19971a1a63d2b16842157b4941e61d73a46318633ce185b2ed71df9a5db09" => :catalina
+    sha256 "4459bbef81e9a9d8872bd4ef9ebf5d70620f2723956ae028ce5542288793f753" => :mojave
+    sha256 "0ea7ec70be5c0e02a211f7079afd181568f2085c0982b1d4bf7a27ceac8f2347" => :high_sierra
   end
 
   depends_on "boost"
@@ -18,7 +17,7 @@ class SourceHighlight < Formula
   def install
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
-                          "--with-boost=#{HOMEBREW_PREFIX}"
+                          "--with-boost=#{Formula["boost"].opt_prefix}"
     system "make", "install"
 
     bash_completion.install "completion/source-highlight"
